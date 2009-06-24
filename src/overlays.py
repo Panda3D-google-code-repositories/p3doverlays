@@ -1,7 +1,3 @@
-""" 
-Documentation for p3doverlays.
-"""
-
 from pandac.PandaModules import *
 
 class GeomEdit:
