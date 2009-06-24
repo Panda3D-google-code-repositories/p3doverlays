@@ -1,0 +1,493 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Classes &mdash; Panda3D Overlays v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Panda3D Overlays v1.0 documentation" href="index.html" />
+    <link rel="prev" title="Samples" href="Samples.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="Samples.html" title="Samples"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-overlays">
+<h1>Classes<a class="headerlink" href="#module-overlays" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="pixelnode">
+<h2><tt class="docutils literal"><span class="pre">PixelNode</span></tt><a class="headerlink" href="#pixelnode" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.PixelNode">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">PixelNode</tt><big>(</big><em>name=None</em>, <em>parent=None</em><big>)</big><a class="headerlink" href="#overlays.PixelNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">libpanda.NodePath</span></tt>, <a title="overlays.OverlayContainer" class="reference internal" href="#overlays.OverlayContainer"><tt class="xref docutils literal"><span class="pre">overlays.OverlayContainer</span></tt></a></p>
+<p>PixelNode is the root node for all overlays (and 2D elements in general). 
+Overlays should be reparented to this node.</p>
+<p>If <tt class="docutils literal"><span class="pre">name</span></tt> is not specified, one will be generated. If <tt class="docutils literal"><span class="pre">parent</span></tt> is not
+specified, Panda&#8217;s <tt class="docutils literal"><span class="pre">render2d</span></tt> node will be used.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Under the hood, PixelNode is a NodePath that is positioned in the upper
+left corner (-1, 0, 1) and scaled to enable pixel positioning (its size
+is 2.0/windowXSize by -2.0/windowYSize).</p>
+</div>
+<dl class="method">
+<dt id="overlays.PixelNode.aspectRatioChanged">
+<tt class="descname">aspectRatioChanged</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.PixelNode.aspectRatioChanged" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called to notify the node that the aspect ratio has been changed. This
+is generally used like so:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">base</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s">&#39;aspectRatioChanged&#39;</span><span class="p">,</span> <span class="n">pixelNode</span><span class="o">.</span><span class="n">aspectRatioChanged</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="overlaycontainer">
+<h2><tt class="docutils literal"><span class="pre">OverlayContainer</span></tt><a class="headerlink" href="#overlaycontainer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.OverlayContainer">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlayContainer</tt><big>(</big><em>name=None</em>, <em>noNode=False</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>The base class for all overlays, but can also act as a container
+for other overlays (i.e. a panel).</p>
+<p>If an overlay name is not specified, it will be generated using
+the class name and a unique identifier, such as:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">OverlayContainer241222</span>
+</pre></div>
+</div>
+<p>You can create your own overlays by extending <tt class="docutils literal"><span class="pre">OverlayContainer</span></tt>
+and passing <tt class="docutils literal"><span class="pre">noNode</span></tt> as <tt class="xref docutils literal"><span class="pre">True</span></tt> (which allows you to create the node).
+After you call this constructor, you can use <tt class="docutils literal"><span class="pre">self.name</span></tt> to retrieve
+the potentially generated name.</p>
+<dl class="method">
+<dt id="overlays.OverlayContainer.destroy">
+<tt class="descname">destroy</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.destroy" title="Permalink to this definition">¶</a></dt>
+<dd>Destroys this overlay and removes its node. Any further calls to setPos
+or other node-related methods will raise exceptions.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.OverlayContainer.getPos">
+<tt class="descname">getPos</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.getPos" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the position of this overlay as a tuple of <tt class="docutils literal"><span class="pre">(x,</span> <span class="pre">y)</span></tt>,
+in pixels.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.OverlayContainer.reparentTo">
+<tt class="descname">reparentTo</tt><big>(</big><em>parent</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.reparentTo" title="Permalink to this definition">¶</a></dt>
+<dd>Moves this overlay under the given parent node or overlay.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.OverlayContainer.setPos">
+<tt class="descname">setPos</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setPos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the position of this overlay in pixels, where (0, 0) 
+is the upper left.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Under the hood, this simply calls <tt class="docutils literal"><span class="pre">setPos(x,</span> <span class="pre">0,</span> <span class="pre">y)</span></tt> on the 
+node. Reparenting this to <a title="overlays.PixelNode" class="reference internal" href="#overlays.PixelNode"><tt class="xref docutils literal"><span class="pre">PixelNode</span></tt></a>
+allows us to set its position in screen-space coordinates.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.OverlayContainer.setZIndex">
+<tt class="descname">setZIndex</tt><big>(</big><em>order</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setZIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the z-Index (depth) of this overlay. Higher numbers brings an
+item closer to the front.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Under the hood, this simply calls <tt class="docutils literal"><span class="pre">setBin('fixed',</span> <span class="pre">order)</span></tt> on
+the node.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="overlay">
+<h2><tt class="docutils literal"><span class="pre">Overlay</span></tt><a class="headerlink" href="#overlay" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.Overlay">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">Overlay</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>texcoords=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.Overlay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="overlays.OverlayContainer" class="reference internal" href="#overlays.OverlayContainer"><tt class="xref docutils literal"><span class="pre">overlays.OverlayContainer</span></tt></a></p>
+<p>Creates an overlay with the given options. If <tt class="docutils literal"><span class="pre">texcoords</span></tt> or 
+<tt class="docutils literal"><span class="pre">atlas</span></tt> is not specified, the geometry&#8217;s vertices will not be 
+generated with UV data from 0 to 1, so that the texture fills to 
+the overlay size.</p>
+<p>As with other overlays, if <tt class="docutils literal"><span class="pre">name</span></tt> is not specified, it will be generated.
+The <tt class="docutils literal"><span class="pre">size</span></tt> of the overlay can be included at creation to avoid the need to 
+re-write the vertices later. If <tt class="docutils literal"><span class="pre">color</span></tt> is specified, it will be set on the
+resulting NodePath.</p>
+<p>The <tt class="docutils literal"><span class="pre">texcoords</span></tt> parameter is a tuple of texture coordinates given in pixels,
+see the tutorials for further details.</p>
+<dl class="method">
+<dt id="overlays.Overlay.getScale">
+<tt class="descname">getScale</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.Overlay.getScale" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the scale of the overlay.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.getSize">
+<tt class="descname">getSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.Overlay.getSize" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the size of this overlay in pixels, as a tuple of width, height.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.setScale">
+<tt class="descname">setScale</tt><big>(</big><em>xScale</em>, <em>yScale</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setScale" title="Permalink to this definition">¶</a></dt>
+<dd>Applies the given scale to the overlay, where (1, 1) is a 100% x 
+and y scale (normal).</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.setSize">
+<tt class="descname">setSize</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setSize" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the size of this overlay in pixels.</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="overlayslice3">
+<h2><tt class="docutils literal"><span class="pre">OverlaySlice3</span></tt><a class="headerlink" href="#overlayslice3" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.OverlaySlice3">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlaySlice3</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>border=5</em>, <em>texcoords=None</em>, <em>horizontal=True</em>, <em>color1=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>color2=Vec4(0.75</em>, <em>0.75</em>, <em>0.75</em>, <em>1)</em><big>)</big><a class="headerlink" href="#overlays.OverlaySlice3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="overlays.Overlay" class="reference internal" href="#overlays.Overlay"><tt class="xref docutils literal"><span class="pre">overlays.Overlay</span></tt></a></p>
+<p>Creates a sliced overlay with the given options, for scaling
+along one axis without quality loss.</p>
+<p>Sliced overlays are a single geometry with multiple parts. 3-sliced
+geometries use 3 parts: the center and its two borders. This overlay is useful
+for elements such as scrollbars and sliders.</p>
+<p>The <tt class="docutils literal"><span class="pre">texcoords</span></tt> argument is a tuple of the upper-left and lower-right pixels
+to slice. The default width/height of the <tt class="docutils literal"><span class="pre">border</span></tt> is 5, and it&#8217;s assumed
+that there are no gaps between parts. The actual texture coordinates of each
+part will be determined based on the given <tt class="docutils literal"><span class="pre">border</span></tt> and <tt class="docutils literal"><span class="pre">texcoords</span></tt> values, and
+whether or not the result should be <tt class="docutils literal"><span class="pre">horizontal</span></tt>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="overlayslice9">
+<h2><tt class="docutils literal"><span class="pre">OverlaySlice9</span></tt><a class="headerlink" href="#overlayslice9" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.OverlaySlice9">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlaySlice9</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>border=5</em>, <em>texcoords=None</em>, <em>color1=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>color2=Vec4(0.75</em>, <em>0.75</em>, <em>0.75</em>, <em>1)</em><big>)</big><a class="headerlink" href="#overlays.OverlaySlice9" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="overlays.Overlay" class="reference internal" href="#overlays.Overlay"><tt class="xref docutils literal"><span class="pre">overlays.Overlay</span></tt></a></p>
+<p>Creates a sliced overlay with the given options, for scaling
+along X and Y axis without quality loss.</p>
+<p>Sliced overlays are a single geometry with multiple parts. 9-sliced
+geometries use 9 parts: four corners, the center and the surrounding edges. 
+This overlay is useful for elements such as dialogs, buttons and decorated panels.</p>
+<p>The <tt class="docutils literal"><span class="pre">texcoords</span></tt> argument is a tuple of the upper-left and lower-right pixels
+to slice. The default size of the <tt class="docutils literal"><span class="pre">border</span></tt> edges is 5, and it&#8217;s assumed
+that there are no gaps between parts. The actual texture coordinates of each
+part will be determined based on the given <tt class="docutils literal"><span class="pre">border</span></tt> and <tt class="docutils literal"><span class="pre">texcoords</span></tt> values.</p>
+<p>Unlike 3-sliced overlays, 9-slicing uses a more flexible <tt class="docutils literal"><span class="pre">border</span></tt> to support
+edges of different sizes. It expects a tuple of <cite>(top, left, bottom, right)</cite> edges,
+or a single number to use for all edges.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="textoverlay">
+<h2><tt class="docutils literal"><span class="pre">TextOverlay</span></tt><a class="headerlink" href="#textoverlay" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.TextOverlay">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">TextOverlay</tt><big>(</big><em>name=None</em>, <em>msg=None</em>, <em>textSize='auto'</em>, <em>textGen=None</em>, <em>font=None</em>, <em>color=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>align=0</em>, <em>wordwrap=None</em>, <em>trimHeight=True</em>, <em>generate=True</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="overlays.OverlayContainer" class="reference internal" href="#overlays.OverlayContainer"><tt class="xref docutils literal"><span class="pre">overlays.OverlayContainer</span></tt></a></p>
+<p>TextOverlay provides a simple manner of displaying crisp text as an overlay.
+Each text overlay contains: a TextNode for generation, a &#8216;top&#8217; node, and the
+actual text node (if it exists) parented to the &#8216;top node&#8217;.</p>
+<p>Overlays use pixelsPerUnit and scaling to generate crisp text. For the best 
+results, you should set the overlay&#8217;s text size (i.e. text scale) to match 
+the pixelsPerUnit of your font. You can use <a title="overlays.TextOverlay.AUTO_SIZE" class="reference internal" href="#overlays.TextOverlay.AUTO_SIZE"><tt class="xref docutils literal"><span class="pre">AUTO_SIZE</span></tt></a> (the default
+text size) to scale the generated text to its pixels per unit &#8211; or 30 if the
+font is not dynamic. Manually setting the size with <a title="overlays.TextOverlay.setTextSize" class="reference internal" href="#overlays.TextOverlay.setTextSize"><tt class="xref docutils literal"><span class="pre">setTextSize()</span></tt></a> 
+is more useful for static fonts, or when you wish to scale the font 
+regardless of its pixels per unit.</p>
+<p>A font height of 1.0 is a Panda standard, and using different values 
+(such as using font.setPointSize, which adjusts the height internally) may
+create undesired results with TextOverlay.</p>
+<p>If <tt class="docutils literal"><span class="pre">msg</span></tt> is specified and <tt class="docutils literal"><span class="pre">generate</span></tt> is not False, a text node will be generated
+after the properties are set.</p>
+<p>If no <tt class="docutils literal"><span class="pre">textGen</span></tt> is specified, one will be created. Likewise, if <tt class="docutils literal"><span class="pre">font</span></tt> is not 
+specified, the <tt class="docutils literal"><span class="pre">defaultFont</span></tt> will be used if it has been set, otherwise 
+<tt class="docutils literal"><span class="pre">textGen</span></tt>&#8216;s default font will be used. The <tt class="docutils literal"><span class="pre">color</span></tt> is the color for the text
+generator, as is <tt class="docutils literal"><span class="pre">align</span></tt> and <tt class="docutils literal"><span class="pre">wordwrap</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Wordwrap is given in pixels, and it is assumed to be the desired width
+of the overlay. Using <a title="overlays.TextOverlay.getSize" class="reference internal" href="#overlays.TextOverlay.getSize"><tt class="xref docutils literal"><span class="pre">getSize()</span></tt></a> with wordwrapping will return the
+wordwrapping, not the frame of the text.</p>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">lineHeight</span></tt> of a font is initially trimmed, as to remove the extra space 
+above most fonts. Set this to <tt class="xref docutils literal"><span class="pre">False</span></tt> if you&#8217;re having problems
+with text y-offset.</p>
+<dl class="attribute">
+<dt id="overlays.TextOverlay.AUTO_SIZE">
+<tt class="descname">AUTO_SIZE</tt><a class="headerlink" href="#overlays.TextOverlay.AUTO_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd>The text overlay will attempt to set the text size to the pixelsPerUnit
+of the current font. If the current font is not dynamic, it will set
+the text size to 30 (which is the default from egg-mkfont).</dd></dl>
+
+<dl class="attribute">
+<dt id="overlays.TextOverlay.defaultFont">
+<tt class="descname">defaultFont</tt><a class="headerlink" href="#overlays.TextOverlay.defaultFont" title="Permalink to this definition">¶</a></dt>
+<dd>Newly created TextOverlays will use this if no font is specified.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.destroy">
+<tt class="descname">destroy</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.destroy" title="Permalink to this definition">¶</a></dt>
+<dd>Destroys this overlay.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.destroyText">
+<tt class="descname">destroyText</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.destroyText" title="Permalink to this definition">¶</a></dt>
+<dd>Destroys the text node (not the textGen) if it exists.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.detachText">
+<tt class="descname">detachText</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.detachText" title="Permalink to this definition">¶</a></dt>
+<dd>Detaches the rendered text node without destroying it, returning
+the text node or None if one did not exist. This also sets this overlay&#8217;s
+text node to None.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.generate">
+<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.generate" title="Permalink to this definition">¶</a></dt>
+<dd>Destroys the last text node and generates a new node using 
+this overlay&#8217;s textGen. The new node will be resized to the
+current text size.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.getSize">
+<tt class="descname">getSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.getSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of the text node, in pixels. If
+word-wrapping is set on the textGen, it will be assumed to be the
+desired width.</p>
+<p>Note that no setSize function exists &#8211; use 
+setScale() if you wish to scale the overlay, setTextScale() to set
+point size, or use word-wrapping to set the text box width in pixels 
+(and the height will be computed accordingly).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.getTextSize">
+<tt class="descname">getTextSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.getTextSize" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the text size, or attempts to find it if
+<a title="overlays.TextOverlay.isAutoSize" class="reference internal" href="#overlays.TextOverlay.isAutoSize"><tt class="xref docutils literal"><span class="pre">isAutoSize()</span></tt></a> returns <tt class="xref docutils literal"><span class="pre">True</span></tt>.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.getWordwrap">
+<tt class="descname">getWordwrap</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.getWordwrap" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the wordwrap, in pixels.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.isAutoSize">
+<tt class="descname">isAutoSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.isAutoSize" title="Permalink to this definition">¶</a></dt>
+<dd>Returns <tt class="xref docutils literal"><span class="pre">True</span></tt> if <a title="overlays.TextOverlay.AUTO_SIZE" class="reference internal" href="#overlays.TextOverlay.AUTO_SIZE"><tt class="xref docutils literal"><span class="pre">AUTO_SIZE</span></tt></a> is on.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.lineHeightExtra">
+<tt class="descname">lineHeightExtra</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.lineHeightExtra" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the line height minus 1.0 (standard Panda text height) in pixels.</dd></dl>
+
+<dl class="staticmethod">
+<dt id="overlays.TextOverlay.loadFont">
+<em class="property">
+static </em><tt class="descname">loadFont</tt><big>(</big><em>ref</em>, <em>size=15</em>, <em>spaceAdvance=None</em>, <em>lineHeight=None</em>, <em>scaleFactor=1</em>, <em>textureMargin=2</em>, <em>minFilter=0</em>, <em>magFilter=0</em>, <em>renderMode=None</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.loadFont" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function simply calls loadFont with the above parameters &#8211; it is included
+for convenience.</p>
+<p>Note that <tt class="docutils literal"><span class="pre">size</span></tt> is actually the pixelsPerUnit (for dynamic fonts). See 
+main description for details.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="overlays.TextOverlay.setFontSize">
+<em class="property">
+static </em><tt class="descname">setFontSize</tt><big>(</big><em>font</em>, <em>size</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setFontSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience function to set the pixelsPerUnit of a dynamic font, if 
+necessary. This function will do nothing if the font is static.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This method uses <tt class="docutils literal"><span class="pre">Font.clear()</span></tt> which wastes memory in Panda 1.6.2
+and early; use it scarcely or not at all. Newer versions of Panda should
+include an easy way to copy fonts for caching, as well as a fix to ensure
+that no associations to the old font pages stay around.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.setTextSize">
+<tt class="descname">setTextSize</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setTextSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the scale of the text node and repositions it
+to fit in the upper left (0, 0) of the parent node.</p>
+<p>If size is <a title="overlays.TextOverlay.AUTO_SIZE" class="reference internal" href="#overlays.TextOverlay.AUTO_SIZE"><tt class="xref docutils literal"><span class="pre">AUTO_SIZE</span></tt></a>, it will attempt to resize the text
+to the current font&#8217;s pixels per units (or default to size 30 
+for static fonts).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.setWordwrap">
+<tt class="descname">setWordwrap</tt><big>(</big><em>wordwrap</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setWordwrap" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the wordwrap, in pixels.</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="geomgen-and-geomedit">
+<h2><tt class="docutils literal"><span class="pre">GeomGen</span></tt> and <tt class="docutils literal"><span class="pre">GeomEdit</span></tt><a class="headerlink" href="#geomgen-and-geomedit" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">overlays</span></tt> module includes two classes to be used
+as an alternative to CardMaker, as to allow for multiple quads
+within a single node as well as vertex rewriting (for fast resizing).</p>
+<dl class="class">
+<dt id="overlays.GeomGen">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomGen</tt><a class="headerlink" href="#overlays.GeomGen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="overlays.GeomEdit" class="reference internal" href="#overlays.GeomEdit"><tt class="xref docutils literal"><span class="pre">overlays.GeomEdit</span></tt></a></p>
+<p>Used for initially generating geometry.</p>
+<dl class="method">
+<dt id="overlays.GeomGen.endGeom">
+<tt class="descname">endGeom</tt><big>(</big><em>nodeName</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.endGeom" title="Permalink to this definition">¶</a></dt>
+<dd>Finishes creating the geometry and returns a node.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.GeomGen.next">
+<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>vertex=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a sub-card (a quad) to the current geometry.
+The positions are based on Panda3D&#8217;s render2d coordinate system: (-1, -1) is bottom 
+left and (1, 1) is top right.</p>
+<p>Use the converter methods to pass standard &#8216;screen&#8217; position and size &#8211; however,
+it is recommended that the card&#8217;s upper left corner remains at (0, 0) in 
+world space in order to take full advantage of Node.setPos().</p>
+<p>Once all sub-cards have been added, generate the Node via _endGeometry.</p>
+<p>When generating, <tt class="docutils literal"><span class="pre">vertex</span></tt> is generally not used (unless a different vertex 
+writer is desired).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.GeomGen.startGeom">
+<tt class="descname">startGeom</tt><big>(</big><em>hasColor=False</em>, <em>texture=None</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.startGeom" title="Permalink to this definition">¶</a></dt>
+<dd>Called to start creating card geometry. 
+Vertex colours will not be stored if hasColor is left False; this 
+will result in a single-colour geometry. To colour sub-cards differently, 
+use has hasColor=True.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="overlays.GeomEdit">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomEdit</tt><a class="headerlink" href="#overlays.GeomEdit" title="Permalink to this definition">¶</a></dt>
+<dd><p>A base class used only for editing geometry made with GeomGen.</p>
+<dl class="method">
+<dt id="overlays.GeomEdit.next">
+<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>vertex=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomEdit.next" title="Permalink to this definition">¶</a></dt>
+<dd>Rewrites the quad data to the given vertex writer. <tt class="docutils literal"><span class="pre">uvdata</span></tt> and 
+<tt class="docutils literal"><span class="pre">color</span></tt> is ignored when editing.</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Classes</a><ul>
+<li><a class="reference external" href="#pixelnode"><tt class="docutils literal"><span class="pre">PixelNode</span></tt></a></li>
+<li><a class="reference external" href="#overlaycontainer"><tt class="docutils literal"><span class="pre">OverlayContainer</span></tt></a></li>
+<li><a class="reference external" href="#overlay"><tt class="docutils literal"><span class="pre">Overlay</span></tt></a></li>
+<li><a class="reference external" href="#overlayslice3"><tt class="docutils literal"><span class="pre">OverlaySlice3</span></tt></a></li>
+<li><a class="reference external" href="#overlayslice9"><tt class="docutils literal"><span class="pre">OverlaySlice9</span></tt></a></li>
+<li><a class="reference external" href="#textoverlay"><tt class="docutils literal"><span class="pre">TextOverlay</span></tt></a></li>
+<li><a class="reference external" href="#geomgen-and-geomedit"><tt class="docutils literal"><span class="pre">GeomGen</span></tt> and <tt class="docutils literal"><span class="pre">GeomEdit</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="Samples.html"
+                                  title="previous chapter">Samples</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Classes.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Samples.html" title="Samples"
+             >previous</a> |</li>
+        <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, dave.des.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
