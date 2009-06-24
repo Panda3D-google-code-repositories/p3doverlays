@@ -26,9 +26,9 @@ overlays.Overlay.getScale method Classes.html
 overlays.Overlay class Classes.html
 overlays.OverlayContainer.getPos method Classes.html
 overlays.TextOverlay.isAutoSize method Classes.html
-overlays.Overlay.setSize method Classes.html
-overlays.OverlayContainer.setPos method Classes.html
 overlays.OverlaySlice9 class Classes.html
+overlays.OverlayContainer.setPos method Classes.html
+overlays.Overlay.setSize method Classes.html
 overlays.TextOverlay.getTextSize method Classes.html
 overlays.TextOverlay.getWordwrap method Classes.html
 overlays.TextOverlay.lineHeightExtra method Classes.html

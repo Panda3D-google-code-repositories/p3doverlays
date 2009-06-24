@@ -63,6 +63,19 @@ such as:
 * Grouping overlays with OverlayContainer
 * Ordering overlays with z-index
 
+.. image:: tut2.png
+
+Simple 2D Games
+---------------------------------
+
+The complete source code for this tutorial can be found 
+`here </svn/trunk/samples/Test2DGame.py>`_.
+
+Press space to animate the sprite and have him walk across 
+the screen.
+
+.. image:: tut3.png 
+
 ``overlaytool``
 ---------------------------------
 
