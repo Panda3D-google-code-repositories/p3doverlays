@@ -248,8 +248,8 @@ regardless of its pixels per unit.</p>
 <p>A font height of 1.0 is a Panda standard, and using different values 
 (such as using font.setPointSize, which adjusts the height internally) may
 create undesired results with TextOverlay.</p>
-<p>If <tt class="docutils literal"><span class="pre">msg</span></tt> is specified and <tt class="docutils literal"><span class="pre">generate</span></tt> is not False, a text node will be generated
-after the properties are set.</p>
+<p>If <tt class="docutils literal"><span class="pre">msg</span></tt> is specified and <tt class="docutils literal"><span class="pre">generate</span></tt> is not <tt class="xref docutils literal"><span class="pre">False</span></tt>, a text node will be 
+generated after the properties are set.</p>
 <p>If no <tt class="docutils literal"><span class="pre">textGen</span></tt> is specified, one will be created. Likewise, if <tt class="docutils literal"><span class="pre">font</span></tt> is not 
 specified, the <tt class="docutils literal"><span class="pre">defaultFont</span></tt> will be used if it has been set, otherwise 
 <tt class="docutils literal"><span class="pre">textGen</span></tt>&#8216;s default font will be used. The <tt class="docutils literal"><span class="pre">color</span></tt> is the color for the text
@@ -261,7 +261,7 @@ of the overlay. Using <a title="overlays.TextOverlay.getSize" class="reference i
 wordwrapping, not the frame of the text.</p>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">lineHeight</span></tt> of a font is initially trimmed, as to remove the extra space 
-above most fonts. Set this to <tt class="xref docutils literal"><span class="pre">False</span></tt> if you&#8217;re having problems
+above most fonts. Set <tt class="docutils literal"><span class="pre">trimHeight</span></tt> to <tt class="xref docutils literal"><span class="pre">False</span></tt> if you&#8217;re having problems
 with text y-offset.</p>
 <dl class="attribute">
 <dt id="overlays.TextOverlay.AUTO_SIZE">

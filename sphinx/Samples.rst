@@ -96,9 +96,10 @@ the screen.
 
 The ``overlaytool`` is a simple visualizer for texture slicing with
 overlays, and it's also a demonstration of the power and flexibility 
-of this module. All of it -- including the pointer, help window, the text,
-and the resizable image itself -- was created using overlays. Working with
-pixels made what would have been a difficult project a *very* simple one. 
+of this module. All of it -- including the pixel pointer/measurer, the help 
+window, text elements, and the resizable image itself -- was created using 
+overlays. Working with pixels made what would have been a difficult 
+project a *very* simple and straight-forward one.
 
 .. image:: tut4.png
 
