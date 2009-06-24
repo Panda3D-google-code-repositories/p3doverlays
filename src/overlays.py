@@ -138,13 +138,16 @@ class OverlayContainer(object):
         item closer to the front.
         
         .. note:: 
-            Under the hood, this simply calls ``setBin('fixed', order)`` on
-            the node. """
+            This will not affect OverlayContainers, only texture and text based
+            overlays. Under the hood, this simply calls ``setBin('fixed', order)`` 
+            on the node.
+        """
         self.zIndex = order
         if self.node is not None:
             self.node.setBin('fixed', order)
     
     def getZIndex(self):
+        """ Returns the z-Index (depth) of this overlay. """
         return self.zIndex
 
     def destroy(self):
@@ -216,7 +219,7 @@ class PixelNode(NodePath, OverlayContainer):
             
 class Overlay(OverlayContainer):
     """
-    Creates an overlay with the given options. If ``texcoords`` or 
+    Creates a geometry overlay with the given options. If ``texcoords`` or 
     ``atlas`` is not specified, the geometry's vertices will not be 
     generated with UV data from 0 to 1, so that the texture fills to 
     the overlay size.

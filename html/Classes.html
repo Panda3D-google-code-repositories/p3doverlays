@@ -20,7 +20,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Panda3D Overlays v1.0 documentation" href="index.html" />
-    <link rel="prev" title="Samples" href="Samples.html" /> 
+    <link rel="prev" title="Tools and Tutorials" href="Samples.html" /> 
   </head>
   <body>
     <div class="related">
@@ -33,7 +33,7 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="Samples.html" title="Samples"
+          <a href="Samples.html" title="Tools and Tutorials"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -107,6 +107,11 @@ or other node-related methods will raise exceptions.</dd></dl>
 in pixels.</dd></dl>
 
 <dl class="method">
+<dt id="overlays.OverlayContainer.getZIndex">
+<tt class="descname">getZIndex</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.getZIndex" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the z-Index (depth) of this overlay.</dd></dl>
+
+<dl class="method">
 <dt id="overlays.OverlayContainer.reparentTo">
 <tt class="descname">reparentTo</tt><big>(</big><em>parent</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.reparentTo" title="Permalink to this definition">¶</a></dt>
 <dd>Moves this overlay under the given parent node or overlay.</dd></dl>
@@ -131,8 +136,9 @@ allows us to set its position in screen-space coordinates.</p>
 item closer to the front.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Under the hood, this simply calls <tt class="docutils literal"><span class="pre">setBin('fixed',</span> <span class="pre">order)</span></tt> on
-the node.</p>
+<p class="last">This will not affect OverlayContainers, only texture and text based
+overlays. Under the hood, this simply calls <tt class="docutils literal"><span class="pre">setBin('fixed',</span> <span class="pre">order)</span></tt> 
+on the node.</p>
 </div>
 </dd></dl>
 
@@ -146,7 +152,7 @@ the node.</p>
 <em class="property">
 class </em><tt class="descclassname">overlays.</tt><tt class="descname">Overlay</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>texcoords=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.Overlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a title="overlays.OverlayContainer" class="reference internal" href="#overlays.OverlayContainer"><tt class="xref docutils literal"><span class="pre">overlays.OverlayContainer</span></tt></a></p>
-<p>Creates an overlay with the given options. If <tt class="docutils literal"><span class="pre">texcoords</span></tt> or 
+<p>Creates a geometry overlay with the given options. If <tt class="docutils literal"><span class="pre">texcoords</span></tt> or 
 <tt class="docutils literal"><span class="pre">atlas</span></tt> is not specified, the geometry&#8217;s vertices will not be 
 generated with UV data from 0 to 1, so that the texture fills to 
 the overlay size.</p>
@@ -447,7 +453,7 @@ class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomEdit
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="Samples.html"
-                                  title="previous chapter">Samples</a></p>
+                                  title="previous chapter">Tools and Tutorials</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/Classes.txt"
@@ -480,7 +486,7 @@ class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomEdit
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Samples.html" title="Samples"
+          <a href="Samples.html" title="Tools and Tutorials"
              >previous</a> |</li>
         <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
       </ul>

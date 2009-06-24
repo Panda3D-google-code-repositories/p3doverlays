@@ -50,12 +50,61 @@
             
   <div class="section" id="tools-and-tutorials">
 <h1>Tools and Tutorials<a class="headerlink" href="#tools-and-tutorials" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="testadvancedoverlays">
-<h2><tt class="docutils literal"><span class="pre">TestAdvancedOverlays</span></tt><a class="headerlink" href="#testadvancedoverlays" title="Permalink to this headline">¶</a></h2>
+<p>This page is still under construction.</p>
+<div class="section" id="simple-overlays">
+<h2>Simple Overlays<a class="headerlink" href="#simple-overlays" title="Permalink to this headline">¶</a></h2>
 <p>The complete source code for this tutorial can be found
-<a class="reference external" href="http://p3doverlays.googlecode.com/svn/trunk/samples/TestAdvancedOverlays.py">here</a>
-<a class="reference external" href="/trunk/samples/TestAdvancedOverlays.py">here</a></p>
-<p>Tests</p>
+<a class="reference external" href="svn/trunk/samples/TestOverlays.py">here</a>.</p>
+<p>Some Code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pandac.PandaModules</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">direct.directbase.DirectStart</span>
+
+<span class="kn">import</span> <span class="nn">overlays</span>
+
+<span class="n">pixel2d</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">PixelNode</span><span class="p">(</span><span class="s">&#39;g2d&#39;</span><span class="p">)</span>
+
+<span class="n">box1</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">Overlay</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">Vec4</span><span class="p">(</span><span class="o">.</span><span class="mf">9</span><span class="p">,</span> <span class="o">.</span><span class="mf">7</span><span class="p">,</span> <span class="o">.</span><span class="mf">7</span><span class="p">,</span> <span class="mf">1</span><span class="p">))</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">reparentTo</span><span class="p">(</span><span class="n">pixel2d</span><span class="p">)</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">setZIndex</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mf">50</span><span class="p">,</span> <span class="mf">50</span><span class="p">)</span>
+
+<span class="n">myFont</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">TextOverlay</span><span class="o">.</span><span class="n">loadFont</span><span class="p">(</span><span class="s">&#39;res/Aller_Rg.ttf&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">12</span><span class="p">)</span>
+
+<span class="n">myMsg</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&#39;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&#39;</span><span class="p">,</span>
+               <span class="s">&#39; Aenean at orci nulla. Fusce eu dignissim ligula.&#39;</span><span class="p">,</span>
+               <span class="s">&#39; Ut elementum mauris vitae dui luctus aliquet.&#39;</span><span class="p">,</span>
+               <span class="s">&#39; Phasellus consequat sodales rhoncus.&#39;</span><span class="p">))</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">TextOverlay</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">myMsg</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">myFont</span><span class="p">,</span>
+                            <span class="n">color</span><span class="o">=</span><span class="n">Vec4</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">1</span><span class="p">),</span> <span class="n">wordwrap</span><span class="o">=</span><span class="mf">200</span><span class="p">)</span>
+<span class="n">text</span><span class="o">.</span><span class="n">reparentTo</span><span class="p">(</span><span class="n">pixel2d</span><span class="p">)</span>
+
+<span class="n">pad</span> <span class="o">=</span> <span class="mf">5</span>
+
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">box1</span><span class="o">.</span><span class="n">getPos</span><span class="p">()</span>
+<span class="n">text</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">pad</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">pad</span><span class="p">)</span>
+
+<span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">w</span><span class="o">+</span><span class="n">pad</span><span class="o">*</span><span class="mf">2</span><span class="p">,</span> <span class="n">h</span><span class="o">+</span><span class="n">pad</span><span class="o">*</span><span class="mf">2</span><span class="p">)</span>
+
+<span class="n">base</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s">&#39;aspectRatioChanged&#39;</span><span class="p">,</span> <span class="n">pixel2d</span><span class="o">.</span><span class="n">aspectRatioChanged</span><span class="p">)</span>
+
+<span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Result:</p>
+<img alt="_images/tut1.png" src="_images/tut1.png" />
+</div>
+<div class="section" id="advanced-overlays">
+<h2>Advanced Overlays<a class="headerlink" href="#advanced-overlays" title="Permalink to this headline">¶</a></h2>
+<p>The complete source code for this tutorial can be found
+<a class="reference external" href="svn/trunk/samples/TestAdvancedOverlays.py">here</a>.</p>
+<p>This demo is similar to the first, but it adds some functionality
+such as:
+* Mouse picking at an overlay&#8217;s &#8216;absolute screen positions&#8217;
+* Slicing a texture to create a resizable 2D element
+* Grouping overlays with OverlayContainer
+* Ordering overlays with z-index</p>
 </div>
 <div class="section" id="overlaytool">
 <h2><tt class="docutils literal"><span class="pre">overlaytool</span></tt><a class="headerlink" href="#overlaytool" title="Permalink to this headline">¶</a></h2>
@@ -70,7 +119,7 @@ pixels made what would have been a difficult project a <em>very</em> simple one.
 <p>Where TEXTURE is the texture to load, such as <tt class="docutils literal"><span class="pre">res/img.png</span></tt>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This tool was rushed and hackish, and currently only supports Windows
+<p class="last">This tool was rushed &#8211; it currently only supports Windows
 (using Arial font and win32clipboard). At a later time, a cleaner,
 cross-platform tool will be released.</p>
 </div>
@@ -86,7 +135,8 @@ cross-platform tool will be released.</p>
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Tools and Tutorials</a><ul>
-<li><a class="reference external" href="#testadvancedoverlays"><tt class="docutils literal"><span class="pre">TestAdvancedOverlays</span></tt></a></li>
+<li><a class="reference external" href="#simple-overlays">Simple Overlays</a></li>
+<li><a class="reference external" href="#advanced-overlays">Advanced Overlays</a></li>
 <li><a class="reference external" href="#overlaytool"><tt class="docutils literal"><span class="pre">overlaytool</span></tt></a></li>
 </ul>
 </li>
