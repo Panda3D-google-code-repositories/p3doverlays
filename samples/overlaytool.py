@@ -1,23 +1,6 @@
-'''
-Created on 18-Jun-09
-
-@author: Matt
-'''
-from pandac.PandaModules import *
-import direct.directbase.DirectStart
-from direct.task import Task
-
-import sys
-import math
-
-from overlays import *
-
-import win32clipboard as w
-import win32con
-
 class OverlayTool(object):
     
-    """ Change these to be cross-platform later... """
+    # Change these to be cross-platform later... 
     def getClipboard(self): 
         w.OpenClipboard() 
         d=w.GetClipboardData(win32con.CF_TEXT) 
@@ -423,8 +406,20 @@ class OverlayTool(object):
 
 
 if __name__ == '__main__':
+    print "MAIN!!"
+    import direct.directbase.DirectStart
+    from direct.task import Task
+    from pandac.PandaModules import *
+
+    import sys
+    import math
+    
+    from overlays import *
+    import win32clipboard as w
+    import win32con
+    
     #debug
-    sys.argv.append('res/simple_ui.png')
+    #sys.argv.append('res/simple_ui.png')
     
     if len(sys.argv) <= 1:
         print 'Format:\n    overlaytool myTexture.png'

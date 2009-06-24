@@ -1,10 +1,11 @@
+""" 
+Documentation for p3doverlays.
+"""
+
 from pandac.PandaModules import *
-from direct.showbase.DirectObject import DirectObject
 
 class GeomEdit:
-    """
-    A dummy base-class for editing an already generated card.
-    """
+    """ A base class used only for editing geometry made with GeomGen. """
     
     def startGeom(self, hasColor=False, texture=None):
         self.texture = texture
@@ -12,9 +13,8 @@ class GeomEdit:
         return None
     def next(self, x, y, xs, ys, uvdata=None, vertex=None, color=None):
         """
-        Rewrites the quad data to the given vertex writer.
-        
-        @color not used
+        Rewrites the quad data to the given vertex writer. ``uvdata`` and 
+        ``color`` is ignored when editing.
         """
         z = 0
         y = -y
@@ -25,10 +25,7 @@ class GeomEdit:
         vertex.addData3f(Vec3(x, z, y+ys))
         
 class GeomGen(GeomEdit):
-    """ An advanced card maker which can generate multiple cards
-    in a single node, and which can also have its vertex data rewritten
-    for fast resizing. 
-    """
+    """ Used for initially generating geometry. """
     
     def startGeom(self, hasColor=False, texture=None):
         """
@@ -59,7 +56,8 @@ class GeomGen(GeomEdit):
         
         Once all sub-cards have been added, generate the Node via _endGeometry.
         
-        @param vertex generally not used, unless a different vertex writer is desired
+        When generating, ``vertex`` is generally not used (unless a different vertex 
+        writer is desired).
         """
         
         #write vertex data using parent class
@@ -116,21 +114,22 @@ class GeomGen(GeomEdit):
         return nodepath
 
 class OverlayContainer(object):
+    """ 
+    The base class for all overlays, but can also act as a container
+    for other overlays (i.e. a panel).
+    
+    If an overlay name is not specified, it will be generated using
+    the class name and a unique identifier, such as::
+        
+        OverlayContainer241222
+    
+    You can create your own overlays by extending ``OverlayContainer``
+    and passing ``noNode`` as ``True`` (which allows you to create the node).
+    After you call this constructor, you can use ``self.name`` to retrieve
+    the potentially generated name.
+    """
     def __init__(self, name=None, noNode=False):
-        """ 
-        The base class for all overlays, but can also act as a container
-        for other overlays (i.e. a panel). This is useful when you are using
-        the overlays module on its own, independent of any GUI modules.
-        
-        If an overlay name is not specified, it will be generated using
-        the class name and a unique identifier, such as::
-            OverlayContainer241222
-        
-        @param name: the name of this overlay (and its node)
-        @param noNode: subclasses should pass True to not immediately create
-            a node for this overlay
-        @param static: used by subclasses
-        """
+    
         if name is None:
             name = '%s%i' % (self.__class__.__name__, id(self))
         self.name = name
@@ -140,7 +139,11 @@ class OverlayContainer(object):
         
     def setZIndex(self, order):
         """ Sets the z-Index (depth) of this overlay. Higher numbers brings an
-        item closer to the front. """
+        item closer to the front.
+        
+        .. note:: 
+            Under the hood, this simply calls ``setBin('fixed', order)`` on
+            the node. """
         self.zIndex = order
         if self.node is not None:
             self.node.setBin('fixed', order)
@@ -157,9 +160,13 @@ class OverlayContainer(object):
     
     def setPos(self, x, y):
         """
-        Sets the position of this overlay on screen, where (0, 0) 
-        is the upper left and (x, y) is the lower right, where x and
-        y is the window XSize/YSize. 
+        Sets the position of this overlay in pixels, where (0, 0) 
+        is the upper left.
+        
+        .. note:: 
+            Under the hood, this simply calls ``setPos(x, 0, y)`` on the 
+            node. Reparenting this to :class:`PixelNode`
+            allows us to set its position in screen-space coordinates.
         """
         self.x = x
         self.y = y
@@ -167,22 +174,32 @@ class OverlayContainer(object):
             self.node.setPos(x, 0, y)
     
     def getPos(self):
-        """ Returns the position of this overlay as a tuple of X, Y. """
+        """ Returns the position of this overlay as a tuple of ``(x, y)``,
+        in pixels. """
         return self.x, self.y
     
     def reparentTo(self, parent):
         """ Moves this overlay under the given parent node or overlay. """
-        if isinstance(parent, OverlayContainer): 
-            self.node.reparentTo(parent.node)
-        else:
-            self.node.reparentTo(parent)
-    
-    def aspectRatioChanged(self):
-        """ Called to 'refit' this overlay to the newly changed aspect ratio. 
-        Initially does nothing. """
-        pass
-   
+        if self.node is not None:
+            if isinstance(parent, OverlayContainer): 
+                self.node.reparentTo(parent.node)
+            else:
+                self.node.reparentTo(parent)
+       
 class PixelNode(NodePath, OverlayContainer):
+    """
+    PixelNode is the root node for all overlays (and 2D elements in general). 
+    Overlays should be reparented to this node.
+
+    If ``name`` is not specified, one will be generated. If ``parent`` is not
+    specified, Panda's ``render2d`` node will be used.
+
+    .. note::
+        Under the hood, PixelNode is a NodePath that is positioned in the upper
+        left corner (-1, 0, 1) and scaled to enable pixel positioning (its size
+        is 2.0/windowXSize by -2.0/windowYSize). 
+    """
+    
     def __init__(self, name=None, parent=None):
         OverlayContainer.__init__(self, name)
         NodePath.__init__(self, self.name)
@@ -194,34 +211,34 @@ class PixelNode(NodePath, OverlayContainer):
         self.aspectRatioChanged()
 
     def aspectRatioChanged(self):
+        """
+        Called to notify the node that the aspect ratio has been changed. This
+        is generally used like so::
+            base.accept('aspectRatioChanged', pixelNode.aspectRatioChanged)
+        """
         self.setScale(2.0/base.win.getXSize(), 1, -2.0/base.win.getYSize())
             
 class Overlay(OverlayContainer):
     """
-    Overlays are 2D elements described in pixels, attached to the
-    pixel2d node.
-    """
+    Creates an overlay with the given options. If ``texcoords`` or 
+    ``atlas`` is not specified, the geometry's vertices will not be 
+    generated with UV data from 0 to 1, so that the texture fills to 
+    the overlay size.
     
+    As with other overlays, if ``name`` is not specified, it will be generated.
+    The ``size`` of the overlay can be included at creation to avoid the need to 
+    re-write the vertices later. If ``color`` is specified, it will be set on the
+    resulting NodePath. 
+    
+    The ``texcoords`` parameter is a tuple of texture coordinates given in pixels,
+    see the tutorials for further details.
+    """
+        
     geomGen = GeomGen()
     geomEdit = GeomEdit()
-    """ The default CardMaker for card-based Overlays. """
         
     def __init__(self, name=None, size=(0, 0), texture=None, 
                  texcoords=None, color=None):
-        """
-        Creates an overlay with the given options. If texcoords or atlas is 
-        not specified, the geometry's vertices will not be generated with UV
-        data from 0 to 1, i.e. any texture set on this node's overlay will
-        fill to the given size.
-        
-        @param name: the name for this overlay and its node
-        @param size: the size, included here to optionally avoid having to write 
-            vertex data twice
-        @param texture: the texture atlas to use
-        @param texcoords: the texture coordinate for this overlay, generally a tuple of
-            X/Y points
-        @param color: optional color for this overlay's node
-        """
         OverlayContainer.__init__(self, name, noNode=True)
         
         self.texture = texture
@@ -234,32 +251,25 @@ class Overlay(OverlayContainer):
         self.node.setScale(self.xScale, 1, -self.yScale)
         
     def _draw(self, geom, width, height, texcoords=None, vertex=None):
-        """
-        Draws the vertices for this style.
-        """
         geom.startGeom(hasColor=False, texture=self.texture)
         geom.next(0, 0, width, height, texcoords, vertex)
         return geom.endGeom(self.name)
     
     def setScale(self, xScale, yScale):
         """
-        Scales the overlay. Note that the yScale given to the node will
-        actually be negative (to flip the height), so that the texture 
-        appears upright.
+        Applies the given scale to the overlay, where (1, 1) is a 100% x 
+        and y scale (normal).
         """
         self.xScale = xScale
         self.yScale = yScale
         self.node.setScale(xScale, 1, -yScale)
     
     def getScale(self):
+        """ Returns the scale of the overlay. """
         return self.xScale, self.yScale
         
     def setSize(self, width, height):
-        """
-        Sets the size of this overlay in pixels.
-        @param width: the width of this overlay
-        @param height: the height of this overlay 
-        """ 
+        """ Sets the size of this overlay in pixels. """ 
         if self.width != width or self.height != height:
             vdata = self.node.getChildren()[0].node().modifyGeom(0).modifyVertexData()
             vertex = GeomVertexWriter(vdata, 'vertex')
@@ -274,30 +284,24 @@ class Overlay(OverlayContainer):
         return self.width, self.height
 
 class OverlaySlice3(Overlay):
+    """
+    Creates a sliced overlay with the given options, for scaling
+    along one axis without quality loss.
+    
+    Sliced overlays are a single geometry with multiple parts. 3-sliced
+    geometries use 3 parts: the center and its two borders. This overlay is useful
+    for elements such as scrollbars and sliders.
+     
+    The ``texcoords`` argument is a tuple of the upper-left and lower-right pixels
+    to slice. The default width/height of the ``border`` is 5, and it's assumed
+    that there are no gaps between parts. The actual texture coordinates of each
+    part will be determined based on the given ``border`` and ``texcoords`` values, and
+    whether or not the result should be ``horizontal``.
+    """
+    
     def __init__(self, name=None, size=(0, 0), texture=None, 
                  border=5, texcoords=None, horizontal=True,
                  color1=Vec4(1, 1, 1, 1), color2=Vec4(.75, .75, .75, 1)):
-        """
-        Creates a sliced overlay with the given options, for scaling
-        along one axis without quality loss. Texture coordinates should be
-        given of the upper left and bottom right as a tuple of (x1,y1,x2,y2).
-        It's assumed that there are no gaps between the different parts.
-        
-        Sliced overlays use 'borders' of a fixed size, and the center is stretched
-        so that the overall component fits within the given size. In the case of 
-        3-sliced overlays, the 'borders' are the left/right or top/bottom parts
-        for horizontal and vertical orientation, respectively. 
-        
-        @param name: the name for this overlay and its node
-        @param size: the initial size of the overlay 
-        @param texture: the texture atlas to use
-        @param border: the width/height of the corners; default 5
-        @param texcoords: the texture coordinate for this overlay, generally a tuple of
-            X/Y points
-        @param horizontal: True if the orientation is horizontal, False if vertical
-        @param color1: only used if no texture is set; useful for debugging (default white)
-        @param color2: only used if no texture is set; useful for debugging (default gray)
-        """
         self.border = border
         self.horizontal = horizontal
         self.color1 = color1
@@ -305,9 +309,6 @@ class OverlaySlice3(Overlay):
         Overlay.__init__(self, name, size, texture, texcoords)
     
     def _draw(self, geom, width, height, texcoords=None, vertex=None):
-        """
-        Draws the vertices for this style.
-        """
         uv1, uv2, uv3 = None, None, None
         hasTex = texcoords is not None and self.texture is not None
         if hasTex:
@@ -341,26 +342,27 @@ class OverlaySlice3(Overlay):
         return geom.endGeom(self.name)
     
 class OverlaySlice9(Overlay):
+    """
+    Creates a sliced overlay with the given options, for scaling
+    along X and Y axis without quality loss.
+    
+    Sliced overlays are a single geometry with multiple parts. 9-sliced
+    geometries use 9 parts: four corners, the center and the surrounding edges. 
+    This overlay is useful for elements such as dialogs, buttons and decorated panels.
+     
+    The ``texcoords`` argument is a tuple of the upper-left and lower-right pixels
+    to slice. The default size of the ``border`` edges is 5, and it's assumed
+    that there are no gaps between parts. The actual texture coordinates of each
+    part will be determined based on the given ``border`` and ``texcoords`` values.
+    
+    Unlike 3-sliced overlays, 9-slicing uses a more flexible ``border`` to support
+    edges of different sizes. It expects a tuple of `(top, left, bottom, right)` edges,
+    or a single number to use for all edges.
+    """
+    
     def __init__(self, name=None, size=(0, 0), texture=None, 
                  border=5, texcoords=None, color1=Vec4(1, 1, 1, 1), 
                  color2=Vec4(.75, .75, .75, 1)):
-        """
-        Creates a sliced overlay with the given options, for scaling
-        along X and Y axis without quality loss. Texture coordinates should be
-        given of the upper left and bottom right as a tuple of (x1,y1,x2,y2).
-        It's assumed that there are no gaps between the different parts -- the
-        UVs for each part will be calculated according to the border size. 
-                        
-        @param name: the name for this overlay and its node
-        @param size: the initial size of the overlay 
-        @param texture: the texture atlas to use
-        @param border: a tuple of top, left, bottom, right size (pixels), or a single
-            size for all sides
-        @param texcoords: the texture coordinate for this overlay, generally a tuple of
-            X/Y points
-        @param color1: only used if no texture is set; useful for debugging (default white)
-        @param color2: only used if no texture is set; useful for debugging (default gray)
-        """
         self.color1 = color1
         self.color2 = color2
         if not isinstance(border, tuple):
@@ -370,9 +372,6 @@ class OverlaySlice9(Overlay):
         Overlay.__init__(self, name, size, texture, texcoords)
     
     def _draw(self, geom, width, height, texcoords=None, vertex=None):
-        """
-        Draws the vertices for this style.
-        """
         uvtl, uvtop, uvtr = None, None, None
         uvleft, uvcenter, uvright = None, None, None
         uvbl, uvbottom, uvbr = None, None, None
@@ -424,18 +423,37 @@ class OverlaySlice9(Overlay):
 class TextOverlay(OverlayContainer):
     """ 
     TextOverlay provides a simple manner of displaying crisp text as an overlay.
-    Each text overlay contains a top node to hold the generated text node. 
+    Each text overlay contains: a TextNode for generation, a 'top' node, and the
+    actual text node (if it exists) parented to the 'top node'.
     
     Overlays use pixelsPerUnit and scaling to generate crisp text. For the best 
     results, you should set the overlay's text size (i.e. text scale) to match 
-    the pixelsPerUnit of your font. You can use AUTO_SIZE with dynamic fonts, 
-    for convenience. This allows you to change the point size of the font with
-    setPixelsPerUnit (being sure to clear() the font, first), then call generate()
-    on the text overlay to update the text.
+    the pixelsPerUnit of your font. You can use :const:`AUTO_SIZE` (the default
+    text size) to scale the generated text to its pixels per unit -- or 30 if the
+    font is not dynamic. Manually setting the size with :func:`setTextSize` 
+    is more useful for static fonts, or when you wish to scale the font 
+    regardless of its pixels per unit. 
     
     A font height of 1.0 is a Panda standard, and using different values 
     (such as using font.setPointSize, which adjusts the height internally) may
     create undesired results with TextOverlay.
+    
+    If ``msg`` is specified and ``generate`` is not False, a text node will be generated
+    after the properties are set. 
+    
+    If no ``textGen`` is specified, one will be created. Likewise, if ``font`` is not 
+    specified, the ``defaultFont`` will be used if it has been set, otherwise 
+    ``textGen``'s default font will be used. The ``color`` is the color for the text
+    generator, as is ``align`` and ``wordwrap``.
+    
+    .. note::
+        Wordwrap is given in pixels, and it is assumed to be the desired width
+        of the overlay. Using :func:`getSize` with wordwrapping will return the
+        wordwrapping, not the frame of the text.
+        
+    The ``lineHeight`` of a font is initially trimmed, as to remove the extra space 
+    above most fonts. Set this to ``False`` if you're having problems
+    with text y-offset.
     """
     
     @staticmethod
@@ -445,12 +463,11 @@ class TextOverlay(OverlayContainer):
                  magFilter=Texture.FTNearest, 
                  renderMode=None):
         """ 
-        A convenience function to load a font ready for pixel-based overlays. This
-        function simply calls loadFont with the above parameters -- it is included
+        This function simply calls loadFont with the above parameters -- it is included
         for convenience. 
         
-        Note that size is actually the pixelsPerUnit (for dynamic fonts). See 
-        TextOverlay description for details.
+        Note that ``size`` is actually the pixelsPerUnit (for dynamic fonts). See 
+        main description for details.
         """
         return loader.loadFont(ref, spaceAdvance=spaceAdvance,
                                     lineHeight=lineHeight, 
@@ -464,6 +481,12 @@ class TextOverlay(OverlayContainer):
         """
         A convenience function to set the pixelsPerUnit of a dynamic font, if 
         necessary. This function will do nothing if the font is static.
+        
+        .. note:: 
+            This method uses ``Font.clear()`` which wastes memory in Panda 1.6.2
+            and early; use it scarcely or not at all. Newer versions of Panda should
+            include an easy way to copy fonts for caching, as well as a fix to ensure
+            that no associations to the old font pages stay around. 
         """
         if isinstance(font, DynamicTextFont):
             ppu = font.getPixelsPerUnit()
@@ -484,28 +507,12 @@ class TextOverlay(OverlayContainer):
                  textGen=None, font=None, color=Vec4(1, 1, 1, 1), 
                  align=TextNode.ALeft, wordwrap=None, trimHeight=True, 
                  generate=True):
-        """ Creates a new TextOverlay with the given options. 
-        
-        @param name: the name for the top node in this overlay, or None to generate one
-        @param msg: the text to display for this overlay
-        @param textSize: the desired size of the text node, or AUTO_SIZE
-        @param textGen: the TextNode to use for generation, or None 
-            to create a new instance
-        @param font: the font to use in this overlay (and attach to the text)
-        @param color: the color of the text, default white
-        @param align: the alignment of the text, default TextNode.ALeft
-        @param wordwrap: the width (in pixels) for word-wrapping
-        @param trimHeight: removes the initial spacing above the text, due to
-            the font's line height being scaled
-        @param generate: whether or not to generate() this overlay once the above
-            properties have been set
-        """
         OverlayContainer.__init__(self, name, noNode=True)
                 
         self.node = NodePath(self.name)
         """ A node which contains the text node. """
         self.text = None
-        """ The panda node generated from TextNode. """
+        """ The panda node generated from ``TextNode``. """
         
         self.setZIndex(0)
         
@@ -529,18 +536,20 @@ class TextOverlay(OverlayContainer):
             self.generate()
     
     def setWordwrap(self, wordwrap):
+        """ Sets the wordwrap, in pixels. """
         self.wordwrap = wordwrap
         self.textGen.setWordwrap(wordwrap / self.getTextSize())
     
     def getWordwrap(self):
+        """ Returns the wordwrap, in pixels. """
         return self.wordwrap
     
     def setTextSize(self, size):
         """ 
         Sets the scale of the text node and repositions it
-        to the upper left (0, 0) of the parent node.
+        to fit in the upper left (0, 0) of the parent node.
         
-        If size is AUTO_SIZE, it will attempt to resize the text
+        If size is :const:`AUTO_SIZE`, it will attempt to resize the text
         to the current font's pixels per units (or default to size 30 
         for static fonts).
         """
@@ -557,7 +566,7 @@ class TextOverlay(OverlayContainer):
     
     def getTextSize(self):
         """ Returns the text size, or attempts to find it if
-        isAutoSize returns True. """
+        :func:`isAutoSize` returns ``True``. """
         if self.isAutoSize():
             f = self.textGen.getFont()
             if isinstance(f, DynamicTextFont):
@@ -568,6 +577,7 @@ class TextOverlay(OverlayContainer):
             return self.textSize
     
     def isAutoSize(self):
+        """ Returns ``True`` if :data:`AUTO_SIZE` is on. """
         return self.textSize == TextOverlay.AUTO_SIZE
     
     def lineHeightExtra(self):
@@ -576,6 +586,7 @@ class TextOverlay(OverlayContainer):
         return (f.getLineHeight() - 1.0) * self.getTextSize()
     
     def destroy(self):
+        """ Destroys this overlay. """
         self.destroyText()
         self.textGen.removeNode()
         self.textGen = None
@@ -596,7 +607,7 @@ class TextOverlay(OverlayContainer):
             self.text = None
     
     def generate(self):
-        """ Clears the last text node and generates a new node using 
+        """ Destroys the last text node and generates a new node using 
         this overlay's textGen. The new node will be resized to the
         current text size. """
         self.destroyText()
