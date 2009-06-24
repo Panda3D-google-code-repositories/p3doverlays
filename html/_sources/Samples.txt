@@ -7,7 +7,7 @@ Simple Overlays
 --------------------------------
 
 The complete source code for this tutorial can be found 
-`here <svn/trunk/samples/TestOverlays.py>`_.
+`here </svn/trunk/samples/TestOverlays.py>`_.
 
 Some Code::
 
@@ -54,7 +54,7 @@ Advanced Overlays
 ---------------------------------
 
 The complete source code for this tutorial can be found 
-`here <svn/trunk/samples/TestAdvancedOverlays.py>`_. 
+`here </svn/trunk/samples/TestAdvancedOverlays.py>`_. 
 
 This demo is similar to the first, but it adds some functionality
 such as:
