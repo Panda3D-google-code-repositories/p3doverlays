@@ -1,0 +1,28 @@
+# Sphinx inventory version 1
+# Project: Panda3D Overlays
+# Version: 1.0
+overlays mod mytest.html
+overlays.TextOverlay.defaultFont attribute mytest.html
+overlays.TextOverlay.generate method mytest.html
+overlays.TextOverlay.AUTO_SIZE attribute mytest.html
+overlays.TextOverlay.detachText method mytest.html
+overlays.GeomEdit.next method mytest.html
+overlays.GeomGen class mytest.html
+overlays.TextOverlay.getSize method mytest.html
+overlays.TextOverlay.setFontSize staticmethod mytest.html
+overlays.TextOverlay.loadFont staticmethod mytest.html
+overlays.GeomGen.next method mytest.html
+overlays.GeomEdit class mytest.html
+overlays.GeomGen.startGeom method mytest.html
+overlays.GeomGen.endGeom method mytest.html
+overlays.Overlay class mytest.html
+overlays.TextOverlay.setTextSize method mytest.html
+overlays.Overlay.geomEdit attribute mytest.html
+overlays.Overlay.setSize method mytest.html
+overlays.TextOverlay.getTextSize method mytest.html
+overlays.TextOverlay.lineHeightExtra method mytest.html
+overlays.TextOverlay.destroyText method mytest.html
+overlays.TextOverlay class mytest.html
+overlays.Overlay.getSize method mytest.html
+overlays.Overlay.setScale method mytest.html
+overlays.PixelNode class mytest.html

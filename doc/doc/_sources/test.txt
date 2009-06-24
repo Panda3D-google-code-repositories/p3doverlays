@@ -1,0 +1,9 @@
+:mod:`test` -- panda overlays
+==========================================
+
+.. automodule:: test
+    :members:
+
+.. autoclass:: Foo
+    :members:
+    :show-inheritance:

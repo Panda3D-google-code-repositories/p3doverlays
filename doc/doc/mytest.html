@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>overlays – panda overlays &mdash; Panda3D Overlays v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="Panda3D Overlays v1.0 documentation" href="index.html" />
+    <link rel="next" title="Tutorial" href="about.html" />
+    <link rel="prev" title="Panda3D Overlays - Documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="about.html" title="Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Panda3D Overlays - Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="overlays-panda-overlays">
+<h1><tt class="xref docutils literal"><span class="pre">overlays</span></tt> &#8211; panda overlays<a class="headerlink" href="#overlays-panda-overlays" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-overlays">
+<h2>Test<a class="headerlink" href="#module-overlays" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.GeomEdit">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomEdit</tt><a class="headerlink" href="#overlays.GeomEdit" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dummy base-class for editing an already generated card.</p>
+<dl class="method">
+<dt id="overlays.GeomEdit.next">
+<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>vertex=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomEdit.next" title="Permalink to this definition">¶</a></dt>
+<dd>Rewrites the quad data to the given vertex writer.
+&#64;param color: not used</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="overlays.GeomGen">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomGen</tt><a class="headerlink" href="#overlays.GeomGen" title="Permalink to this definition">¶</a></dt>
+<dd><p>An advanced card maker which can generate multiple cards
+in a single node, and which can also have its vertex data rewritten
+for fast resizing.</p>
+<dl class="method">
+<dt id="overlays.GeomGen.endGeom">
+<tt class="descname">endGeom</tt><big>(</big><em>nodeName</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.endGeom" title="Permalink to this definition">¶</a></dt>
+<dd>Finishes creating the geometry and returns a node.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.GeomGen.next">
+<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>vertex=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a sub-card (a quad) to the current geometry.
+The positions are based on Panda3D&#8217;s render2d coordinate system: (-1, -1) is bottom 
+left and (1, 1) is top right.</p>
+<p>Use the converter methods to pass standard &#8216;screen&#8217; position and size &#8211; however,
+it is recommended that the card&#8217;s upper left corner remains at (0, 0) in 
+world space in order to take full advantage of Node.setPos().</p>
+<p>Once all sub-cards have been added, generate the Node via _endGeometry.</p>
+<p>&#64;param vertex: generally not used, unless a different vertex writer is desired</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.GeomGen.startGeom">
+<tt class="descname">startGeom</tt><big>(</big><em>hasColor=False</em>, <em>texture=None</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.startGeom" title="Permalink to this definition">¶</a></dt>
+<dd>Called to start creating card geometry. 
+Vertex colours will not be stored if hasColor is left False; this 
+will result in a single-colour geometry. To colour sub-cards differently, 
+use has hasColor=True.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="overlays.Overlay">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">Overlay</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>texcoords=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.Overlay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overlays are 2D elements described in pixels, attached to the
+pixel2d node.</p>
+<dl class="attribute">
+<dt id="overlays.Overlay.geomEdit">
+<tt class="descname">geomEdit</tt><a class="headerlink" href="#overlays.Overlay.geomEdit" title="Permalink to this definition">¶</a></dt>
+<dd>The default CardMaker for card-based Overlays.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.getSize">
+<tt class="descname">getSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.Overlay.getSize" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the size of this overlay in pixels, as a tuple of width, height.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.setScale">
+<tt class="descname">setScale</tt><big>(</big><em>xScale</em>, <em>yScale</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setScale" title="Permalink to this definition">¶</a></dt>
+<dd>Scales the overlay. Note that the yScale given to the node will
+actually be negative (to flip the height), so that the texture 
+appears upright.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.setSize">
+<tt class="descname">setSize</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setSize" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the size of this overlay in pixels.
+&#64;param width: the width of this overlay
+&#64;param height: the height of this overlay</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="overlays.TextOverlay">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">TextOverlay</tt><big>(</big><em>name=None</em>, <em>msg=None</em>, <em>textSize='auto'</em>, <em>textGen=None</em>, <em>font=None</em>, <em>color=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>align=0</em>, <em>wordwrap=None</em>, <em>trimHeight=True</em>, <em>generate=True</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay" title="Permalink to this definition">¶</a></dt>
+<dd><p>TextOverlay provides a simple manner of displaying crisp text as an overlay.
+Each text overlay contains a top node to hold the generated text node.</p>
+<p>Overlays use pixelsPerUnit and scaling to generate crisp text. For the best 
+results, you should set the overlay&#8217;s text size (i.e. text scale) to match 
+the pixelsPerUnit of your font. You can use AUTO_SIZE with dynamic fonts, 
+for convenience. This allows you to change the point size of the font with
+setPixelsPerUnit (being sure to clear() the font, first), then call generate()
+on the text overlay to update the text.</p>
+<p>A font height of 1.0 is a Panda standard, and using different values 
+(such as using font.setPointSize, which adjusts the height internally) may
+create undesired results with TextOverlay.</p>
+<dl class="attribute">
+<dt id="overlays.TextOverlay.AUTO_SIZE">
+<tt class="descname">AUTO_SIZE</tt><a class="headerlink" href="#overlays.TextOverlay.AUTO_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd>The text overlay will attempt to set the text size to the pixelsPerUnit
+of the current font. If the current font is not dynamic, it will set
+the text size to 30 (which is the default from egg-mkfont).</dd></dl>
+
+<dl class="attribute">
+<dt id="overlays.TextOverlay.defaultFont">
+<tt class="descname">defaultFont</tt><a class="headerlink" href="#overlays.TextOverlay.defaultFont" title="Permalink to this definition">¶</a></dt>
+<dd>Newly created TextOverlays will use this if no font is specified.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.destroyText">
+<tt class="descname">destroyText</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.destroyText" title="Permalink to this definition">¶</a></dt>
+<dd>Destroys the text node (not the textGen) if it exists.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.detachText">
+<tt class="descname">detachText</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.detachText" title="Permalink to this definition">¶</a></dt>
+<dd>Detaches the rendered text node without destroying it, returning
+the text node or None if one did not exist. This also sets this overlay&#8217;s
+text node to None.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.generate">
+<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.generate" title="Permalink to this definition">¶</a></dt>
+<dd>Clears the last text node and generates a new node using 
+this overlay&#8217;s textGen. The new node will be resized to the
+current text size.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.getSize">
+<tt class="descname">getSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.getSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of the text node, in pixels. If
+word-wrapping is set on the textGen, it will be assumed to be the
+desired width.</p>
+<p>Note that no setSize function exists &#8211; use 
+setScale() if you wish to scale the overlay, setTextScale() to set
+point size, or use word-wrapping to set the text box width in pixels 
+(and the height will be computed accordingly).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.getTextSize">
+<tt class="descname">getTextSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.getTextSize" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the text size, or attempts to find it if
+isAutoSize returns True.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.lineHeightExtra">
+<tt class="descname">lineHeightExtra</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.lineHeightExtra" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the line height minus 1.0 (standard Panda text height) in pixels.</dd></dl>
+
+<dl class="staticmethod">
+<dt id="overlays.TextOverlay.loadFont">
+<em class="property">
+static </em><tt class="descname">loadFont</tt><big>(</big><em>ref</em>, <em>size=15</em>, <em>spaceAdvance=None</em>, <em>lineHeight=None</em>, <em>scaleFactor=1</em>, <em>textureMargin=2</em>, <em>minFilter=0</em>, <em>magFilter=0</em>, <em>renderMode=None</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.loadFont" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience function to load a font ready for pixel-based overlays. This
+function simply calls loadFont with the above parameters &#8211; it is included
+for convenience.</p>
+<p>Note that size is actually the pixelsPerUnit (for dynamic fonts). See 
+TextOverlay description for details.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="overlays.TextOverlay.setFontSize">
+<em class="property">
+static </em><tt class="descname">setFontSize</tt><big>(</big><em>font</em>, <em>size</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setFontSize" title="Permalink to this definition">¶</a></dt>
+<dd>A convenience function to set the pixelsPerUnit of a dynamic font, if 
+necessary. This function will do nothing if the font is static.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.setTextSize">
+<tt class="descname">setTextSize</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setTextSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the scale of the text node and repositions it
+to the upper left (0, 0) of the parent node.</p>
+<p>If size is AUTO_SIZE, it will attempt to resize the text
+to the current font&#8217;s pixels per units (or default to size 30 
+for static fonts).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="overlays.PixelNode">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">PixelNode</tt><big>(</big><em>name=None</em>, <em>parent=None</em><big>)</big><a class="headerlink" href="#overlays.PixelNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href=""><tt class="docutils literal"><span class="pre">overlays</span></tt> &#8211; panda overlays</a><ul>
+<li><a class="reference external" href="#module-overlays">Test</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Panda3D Overlays - Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="about.html"
+                                  title="next chapter">Tutorial</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/mytest.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="about.html" title="Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Panda3D Overlays - Documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, dave.des.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

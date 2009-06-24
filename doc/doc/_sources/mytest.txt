@@ -1,0 +1,12 @@
+:mod:`overlays` -- panda overlays
+==========================================
+
+**************
+Test
+**************
+
+.. automodule:: overlays
+    :members:
+
+.. autoclass:: PixelNode
+    :members:
