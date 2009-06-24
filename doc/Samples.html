@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Tools and Tutorials &mdash; Panda3D Overlays v1.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Panda3D Overlays v1.0 documentation" href="index.html" />
+    <link rel="next" title="Classes" href="Classes.html" />
+    <link rel="prev" title="Contents" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="Classes.html" title="Classes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Contents"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tools-and-tutorials">
+<h1>Tools and Tutorials<a class="headerlink" href="#tools-and-tutorials" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="simple-overlays">
+<h2>Simple Overlays<a class="headerlink" href="#simple-overlays" title="Permalink to this headline">¶</a></h2>
+<p>The complete source code for this tutorial can be found
+<a class="reference external" href="../samples/TestOverlays.py">here</a>.</p>
+<p>First we import overlays and set up a root node for our 2D
+elements. We will name the node <tt class="docutils literal"><span class="pre">g2d</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">overlays</span>
+
+<span class="n">pixel2d</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">PixelNode</span><span class="p">(</span><span class="s">&#39;g2d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we can create a red overlay and reparent it to <tt class="docutils literal"><span class="pre">pixel2d</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">box1</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">Overlay</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">Vec4</span><span class="p">(</span><span class="o">.</span><span class="mf">9</span><span class="p">,</span> <span class="o">.</span><span class="mf">7</span><span class="p">,</span> <span class="o">.</span><span class="mf">7</span><span class="p">,</span> <span class="mf">1</span><span class="p">))</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">reparentTo</span><span class="p">(</span><span class="n">pixel2d</span><span class="p">)</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">setZIndex</span><span class="p">(</span><span class="o">-</span><span class="mf">1</span><span class="p">)</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mf">50</span><span class="p">,</span> <span class="mf">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The above is just a simple geometry (a &#8216;card&#8217;) that is coloured red. We&#8217;ve
+also set it&#8217;s depth to -1, this will come in handy later. We&#8217;ve positioned it
+to (50, 50) screen space. Since the overlay has no size, you wouldn&#8217;t see anything
+if you tried running the example now. Let&#8217;s add some text:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">myFont</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">TextOverlay</span><span class="o">.</span><span class="n">loadFont</span><span class="p">(</span><span class="s">&#39;res/Aller_Rg.ttf&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">12</span><span class="p">)</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">TextOverlay</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">myMsg</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">myFont</span><span class="p">,</span>
+                            <span class="n">color</span><span class="o">=</span><span class="n">Vec4</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">1</span><span class="p">),</span> <span class="n">wordwrap</span><span class="o">=</span><span class="mf">200</span><span class="p">)</span>
+<span class="n">text</span><span class="o">.</span><span class="n">reparentTo</span><span class="p">(</span><span class="n">pixel2d</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We use the helper method <tt class="xref docutils literal"><span class="pre">TextOverlay.loadFont()</span></tt> to load our Aller font at
+size 12. This will load the font with a few options already set, to maximize the
+quality of the font.</p>
+<p>We then create a text overlay and give it a message and our font. The scale of the
+generated text node will be computed automatically. We give the text a dark gray colour
+and set its word-wrapping to 200 px. Now, let&#8217;s resize and reposition these two overlays:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pad</span> <span class="o">=</span> <span class="mf">5</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">box1</span><span class="o">.</span><span class="n">getPos</span><span class="p">()</span>
+<span class="n">text</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">pad</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">pad</span><span class="p">)</span>
+
+<span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
+<span class="n">box1</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">w</span><span class="o">+</span><span class="n">pad</span><span class="o">*</span><span class="mf">2</span><span class="p">,</span> <span class="n">h</span><span class="o">+</span><span class="n">pad</span><span class="o">*</span><span class="mf">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We set the location of the text to match the red box, with a slight padding. We
+then set the size of the box, so that the text fits nicely padded inside of it. We
+can then finish off with the following code:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">base</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="s">&#39;aspectRatioChanged&#39;</span><span class="p">,</span> <span class="n">pixel2d</span><span class="o">.</span><span class="n">aspectRatioChanged</span><span class="p">)</span>
+<span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This ensures that the overlays will not look squashed when the aspect ratio changes.</p>
+<p>Result:</p>
+<img alt="_images/tut1.png" src="_images/tut1.png" />
+</div>
+<div class="section" id="advanced-overlays">
+<h2>Advanced Overlays<a class="headerlink" href="#advanced-overlays" title="Permalink to this headline">¶</a></h2>
+<p>The complete source code for this tutorial can be found
+<a class="reference external" href="../samples/TestAdvancedOverlays.py">here</a>.</p>
+<p>This demo is similar to the first, but it adds some functionality
+such as:</p>
+<ul class="simple">
+<li>Mouse picking at an overlay&#8217;s &#8216;absolute screen positions&#8217;</li>
+<li>Slicing a texture to create a resizable 2D element</li>
+<li>Grouping overlays with OverlayContainer</li>
+<li>Ordering overlays with z-index</li>
+<li>Regenerating text overlays</li>
+</ul>
+<img alt="_images/tut2.png" src="_images/tut2.png" />
+</div>
+<div class="section" id="basic-2d-games">
+<h2>Basic 2D Games<a class="headerlink" href="#basic-2d-games" title="Permalink to this headline">¶</a></h2>
+<p>Although the <tt class="docutils literal"><span class="pre">overlays</span></tt> module is better suited for static GUI/HUD elements,
+it can also be used as a base layer for sprite rendering. In the future,
+support will be added for more efficient sprite rendering and manipulation.</p>
+<p><tt class="docutils literal"><span class="pre">Test2DGame</span></tt> demonstrates simple sprite animation. You can find the code
+<a class="reference external" href="../samples/Test2DGame.py">here</a>.</p>
+<p>Press space to animate the sprite and have him walk across
+the screen.</p>
+<img alt="_images/tut3.png" src="_images/tut3.png" />
+</div>
+<div class="section" id="overlaytool">
+<h2><tt class="docutils literal"><span class="pre">overlaytool</span></tt><a class="headerlink" href="#overlaytool" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">overlaytool</span></tt> is a simple visualizer for texture slicing with
+overlays, and it&#8217;s also a demonstration of the power and flexibility
+of this module. All of it &#8211; including the pointer, help window, the text,
+and the resizable image itself &#8211; was created using overlays. Working with
+pixels made what would have been a difficult project a <em>very</em> simple one.</p>
+<img alt="_images/tut4.png" src="_images/tut4.png" />
+<p>Run it like the command line like so:</p>
+<div class="highlight-python"><pre>overlaytool.py TEXTURE</pre>
+</div>
+<p>Where TEXTURE is the texture to load, such as <tt class="docutils literal"><span class="pre">res/img.png</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This tool was rushed &#8211; it currently only supports Windows
+(using Arial font and win32clipboard). At a later time, a cleaner,
+cross-platform tool will be released.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Tools and Tutorials</a><ul>
+<li><a class="reference external" href="#simple-overlays">Simple Overlays</a></li>
+<li><a class="reference external" href="#advanced-overlays">Advanced Overlays</a></li>
+<li><a class="reference external" href="#basic-2d-games">Basic 2D Games</a></li>
+<li><a class="reference external" href="#overlaytool"><tt class="docutils literal"><span class="pre">overlaytool</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">Contents</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="Classes.html"
+                                  title="next chapter">Classes</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/Samples.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Classes.html" title="Classes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Contents"
+             >previous</a> |</li>
+        <li><a href="index.html">Panda3D Overlays v1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009, dave.des.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
