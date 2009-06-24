@@ -7,6 +7,6 @@ tutorials and SVN checkout.
 
 .. toctree::
     :maxdepth: 2
-
+    
     Samples.rst
     Classes.rst

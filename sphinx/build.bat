@@ -1,2 +1,2 @@
-sphinx-build . ../html
+sphinx-build . ../doc
 pause

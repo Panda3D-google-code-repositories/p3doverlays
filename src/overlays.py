@@ -437,8 +437,8 @@ class TextOverlay(OverlayContainer):
     (such as using font.setPointSize, which adjusts the height internally) may
     create undesired results with TextOverlay.
     
-    If ``msg`` is specified and ``generate`` is not False, a text node will be generated
-    after the properties are set. 
+    If ``msg`` is specified and ``generate`` is not ``False``, a text node will be 
+    generated after the properties are set. 
     
     If no ``textGen`` is specified, one will be created. Likewise, if ``font`` is not 
     specified, the ``defaultFont`` will be used if it has been set, otherwise 
@@ -451,7 +451,7 @@ class TextOverlay(OverlayContainer):
         wordwrapping, not the frame of the text.
         
     The ``lineHeight`` of a font is initially trimmed, as to remove the extra space 
-    above most fonts. Set this to ``False`` if you're having problems
+    above most fonts. Set ``trimHeight`` to ``False`` if you're having problems
     with text y-offset.
     """
     

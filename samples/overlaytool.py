@@ -1,3 +1,5 @@
+from pandac.PandaModules import *
+
 class OverlayTool(object):
     
     # Change these to be cross-platform later... 
@@ -406,10 +408,8 @@ class OverlayTool(object):
 
 
 if __name__ == '__main__':
-    print "MAIN!!"
     import direct.directbase.DirectStart
     from direct.task import Task
-    from pandac.PandaModules import *
 
     import sys
     import math
@@ -418,10 +418,9 @@ if __name__ == '__main__':
     import win32clipboard as w
     import win32con
     
-    #debug
-    #sys.argv.append('res/simple_ui.png')
-    
     if len(sys.argv) <= 1:
+        #debug
+        sys.argv.append('res/simple_ui.png')
         print 'Format:\n    overlaytool myTexture.png'
     tex = loader.loadTexture(sys.argv[1])
     print tex.getXSize(), tex.getYSize()
