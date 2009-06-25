@@ -8,7 +8,7 @@ The complete source code for this tutorial can be found
 `here <../samples/TestOverlays.py>`_.
 
 First we import overlays and set up a root node for our 2D
-elements. We will name the node ``g2d``::
+elements. We'll name the node *g2d*::
 
     import overlays
     
@@ -22,7 +22,7 @@ Now we can create a red overlay and reparent it to ``pixel2d``::
     box1.setPos(50, 50)
     
 The above is just a simple geometry (a 'card') that is coloured red. We've
-also set it's depth to -1, this will come in handy later. We've positioned it
+also set it's depth to -1, so that it appears behind the text. We've positioned it
 to (50, 50) screen space. Since the overlay has no size, you wouldn't see anything
 if you tried running the example now. Let's add some text::
 
@@ -113,22 +113,16 @@ the screen.
 ``overlaytool``
 ---------------------------------
 
-The ``overlaytool`` is a simple visualizer for texture slicing with
-overlays, and it's also a demonstration of the power and flexibility 
-of this module. All of it -- including the pixel pointer/measurer, the help 
-window, text elements, and the resizable image itself -- was created using 
-overlays. Working with pixels made what would have been a difficult 
-project a *very* simple and straight-forward one.
+The ``overlaytool`` is a simple visualizer for slicing overlay textures.
+It was written as a test-case for the ``overlays`` module. All of it 
+-- including the pixel pointer/measurer, the help window, text elements, 
+and the resizable image itself -- was created using overlays. Being able to
+work with pixels made this tool *very* easy to write.
 
 .. image:: tut4.png
 
-Run it from the command line like so::
+Windows users can run it from the command-line like so::
 
     overlaytool.py TEXTURE
 
-Where TEXTURE is the texture to load, such as ``res/img.png``.
-
-.. note::
-    This tool was rushed -- it currently only supports Windows
-    (using Arial font and win32clipboard). At a later time, a cleaner,
-    cross-platform tool will be released.
+Where TEXTURE is the texture to load, such as ``res/img.png``. 

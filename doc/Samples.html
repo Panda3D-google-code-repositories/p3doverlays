@@ -55,7 +55,7 @@
 <p>The complete source code for this tutorial can be found
 <a class="reference external" href="../samples/TestOverlays.py">here</a>.</p>
 <p>First we import overlays and set up a root node for our 2D
-elements. We will name the node <tt class="docutils literal"><span class="pre">g2d</span></tt>:</p>
+elements. We&#8217;ll name the node <em>g2d</em>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">overlays</span>
 
 <span class="n">pixel2d</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">PixelNode</span><span class="p">(</span><span class="s">&#39;g2d&#39;</span><span class="p">)</span>
@@ -69,7 +69,7 @@ elements. We will name the node <tt class="docutils literal"><span class="pre">g
 </pre></div>
 </div>
 <p>The above is just a simple geometry (a &#8216;card&#8217;) that is coloured red. We&#8217;ve
-also set it&#8217;s depth to -1, this will come in handy later. We&#8217;ve positioned it
+also set it&#8217;s depth to -1, so that it appears behind the text. We&#8217;ve positioned it
 to (50, 50) screen space. Since the overlay has no size, you wouldn&#8217;t see anything
 if you tried running the example now. Let&#8217;s add some text:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">myFont</span> <span class="o">=</span> <span class="n">overlays</span><span class="o">.</span><span class="n">TextOverlay</span><span class="o">.</span><span class="n">loadFont</span><span class="p">(</span><span class="s">&#39;res/Aller_Rg.ttf&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">12</span><span class="p">)</span>
@@ -149,23 +149,16 @@ the screen.</p>
 </div>
 <div class="section" id="overlaytool">
 <h2><tt class="docutils literal"><span class="pre">overlaytool</span></tt><a class="headerlink" href="#overlaytool" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">overlaytool</span></tt> is a simple visualizer for texture slicing with
-overlays, and it&#8217;s also a demonstration of the power and flexibility
-of this module. All of it &#8211; including the pixel pointer/measurer, the help
-window, text elements, and the resizable image itself &#8211; was created using
-overlays. Working with pixels made what would have been a difficult
-project a <em>very</em> simple and straight-forward one.</p>
+<p>The <tt class="docutils literal"><span class="pre">overlaytool</span></tt> is a simple visualizer for slicing overlay textures.
+It was written as a test-case for the <tt class="docutils literal"><span class="pre">overlays</span></tt> module. All of it
+&#8211; including the pixel pointer/measurer, the help window, text elements,
+and the resizable image itself &#8211; was created using overlays. Being able to
+work with pixels made this tool <em>very</em> easy to write.</p>
 <img alt="_images/tut4.png" src="_images/tut4.png" />
-<p>Run it from the command line like so:</p>
+<p>Windows users can run it from the command-line like so:</p>
 <div class="highlight-python"><pre>overlaytool.py TEXTURE</pre>
 </div>
 <p>Where TEXTURE is the texture to load, such as <tt class="docutils literal"><span class="pre">res/img.png</span></tt>.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This tool was rushed &#8211; it currently only supports Windows
-(using Arial font and win32clipboard). At a later time, a cleaner,
-cross-platform tool will be released.</p>
-</div>
 </div>
 </div>
 
