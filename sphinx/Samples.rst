@@ -76,6 +76,25 @@ such as:
 
 .. image:: tut2.png
 
+Try adding some Panda 3D code immediately after the imports to see
+how it looks with a scene behind it::
+
+    environ = loader.loadModel("models/environment")
+    environ.reparentTo(render)
+    environ.setScale(0.25,0.25,0.25)
+    environ.setPos(-8,42,0)
+    
+    def SpinCameraTask(task):
+      angledegrees = task.time * 6.0
+      angleradians = angledegrees * (math.pi / 180.0)
+      base.camera.setPos(20*math.sin(angleradians),-20.0*math.cos(angleradians),3)
+      base.camera.setHpr(angledegrees, 0, 0)
+      return Task.cont
+    
+    taskMgr.add(SpinCameraTask, "SpinCameraTask")
+
+.. image:: tut2p.png
+
 Basic 2D Games
 ---------------------------------
 
@@ -103,7 +122,7 @@ project a *very* simple and straight-forward one.
 
 .. image:: tut4.png
 
-Run it like the command line like so::
+Run it from the command line like so::
 
     overlaytool.py TEXTURE
 

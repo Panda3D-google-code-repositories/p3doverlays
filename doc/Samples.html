@@ -117,6 +117,24 @@ such as:</p>
 <li>Regenerating text overlays</li>
 </ul>
 <img alt="_images/tut2.png" src="_images/tut2.png" />
+<p>Try adding some Panda 3D code immediately after the imports to see
+how it looks with a scene behind it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">environ</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">loadModel</span><span class="p">(</span><span class="s">&quot;models/environment&quot;</span><span class="p">)</span>
+<span class="n">environ</span><span class="o">.</span><span class="n">reparentTo</span><span class="p">(</span><span class="n">render</span><span class="p">)</span>
+<span class="n">environ</span><span class="o">.</span><span class="n">setScale</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span><span class="mf">0.25</span><span class="p">,</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">environ</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="o">-</span><span class="mf">8</span><span class="p">,</span><span class="mf">42</span><span class="p">,</span><span class="mf">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">SpinCameraTask</span><span class="p">(</span><span class="n">task</span><span class="p">):</span>
+  <span class="n">angledegrees</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">time</span> <span class="o">*</span> <span class="mf">6.0</span>
+  <span class="n">angleradians</span> <span class="o">=</span> <span class="n">angledegrees</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span><span class="p">)</span>
+  <span class="n">base</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mf">20</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angleradians</span><span class="p">),</span><span class="o">-</span><span class="mf">20.0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angleradians</span><span class="p">),</span><span class="mf">3</span><span class="p">)</span>
+  <span class="n">base</span><span class="o">.</span><span class="n">camera</span><span class="o">.</span><span class="n">setHpr</span><span class="p">(</span><span class="n">angledegrees</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">Task</span><span class="o">.</span><span class="n">cont</span>
+
+<span class="n">taskMgr</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">SpinCameraTask</span><span class="p">,</span> <span class="s">&quot;SpinCameraTask&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/tut2p.png" src="_images/tut2p.png" />
 </div>
 <div class="section" id="basic-2d-games">
 <h2>Basic 2D Games<a class="headerlink" href="#basic-2d-games" title="Permalink to this headline">¶</a></h2>
@@ -138,7 +156,7 @@ window, text elements, and the resizable image itself &#8211; was created using
 overlays. Working with pixels made what would have been a difficult
 project a <em>very</em> simple and straight-forward one.</p>
 <img alt="_images/tut4.png" src="_images/tut4.png" />
-<p>Run it like the command line like so:</p>
+<p>Run it from the command line like so:</p>
 <div class="highlight-python"><pre>overlaytool.py TEXTURE</pre>
 </div>
 <p>Where TEXTURE is the texture to load, such as <tt class="docutils literal"><span class="pre">res/img.png</span></tt>.</p>

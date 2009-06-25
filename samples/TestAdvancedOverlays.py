@@ -61,7 +61,7 @@ class TestAdvancedOverlays:
                               color=textColor)
         txt.reparentTo(self.pixel2d)
         txt.setPos(10, 10)
-        
+
         msg = ''.join(('Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                        ' Aenean at orci nulla. Fusce eu dignissim ligula.',
                        ' Ut elementum mauris vitae dui luctus aliquet.',
