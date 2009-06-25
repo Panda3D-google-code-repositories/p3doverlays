@@ -17,6 +17,11 @@ base.setBackgroundColor(.7, .7, .7, 1)
 #root node for overlays
 pixel2d = overlays.PixelNode('g2d')
 
+fnt = overlays.TextOverlay.loadFont('res/DejaVuSans.ttf', size=12)
+text = overlays.TextOverlay(msg='Press space to walk', font=fnt)
+text.reparentTo(pixel2d)
+text.setPos(5, 5)
+
 soldier = overlays.OverlayContainer('soldier')
 soldier.reparentTo(pixel2d)
 
@@ -37,7 +42,6 @@ right_walk2 = addSoldierState(70, 39, 85, 66)
 right_idle.node.show()
 
 soldier.setPos(50, 50)
-
 
 box = overlays.Overlay(size=(300, 300), color=Vec4(0.2, 0.7, 0.2, 1)) 
 box.setZIndex(-1)

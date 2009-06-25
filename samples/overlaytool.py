@@ -1,21 +1,47 @@
 from pandac.PandaModules import *
+import direct.directbase.DirectStart
+from direct.task import Task
 
-class OverlayTool(object):
+import sys
+import math
+
+from overlays import *
+
+class EmptyClipboard(object):
     
-    # Change these to be cross-platform later... 
-    def getClipboard(self): 
+    def supported(self):
+        return False
+    
+    def get(self):
+        return ""
+    
+    def set(self, str):
+        pass
+
+class WinClipboard(EmptyClipboard):
+    
+    def supported(self):
+        return True
+    
+    def get(self): 
+        import win32clipboard as w
+        import win32con
         w.OpenClipboard() 
-        d=w.GetClipboardData(win32con.CF_TEXT) 
+        d=w.GetClipboardData(win32con.CF_TEXT)
         w.CloseClipboard() 
         return d 
      
-    def setClipboard(self, aType, aString): 
+    def set(self, str):
+        import win32clipboard as w
+        import win32con 
         w.OpenClipboard()
         w.EmptyClipboard()
-        w.SetClipboardData(aType,aString) 
+        w.SetClipboardData(win32con.CF_TEXT, str) 
         w.CloseClipboard()
-    
-    def __init__(self, tex, bgColor=Vec4(1, 1, 1, 1)):
+
+class OverlayTool(object):
+        
+    def __init__(self, tex, clipboard, bgColor=Vec4(1, 1, 1, 1)):
         self.tex = tex
         self.bgColor = bgColor
         self.ROW_COL_MAX = 1000
@@ -26,7 +52,9 @@ class OverlayTool(object):
         self.measureWidth = 0
         self.measureHeight = 0
         self.shiftDown = False
-        
+        self.clipboard = clipboard
+        self.clipText = 'Clipboard' if clipboard.supported() else 'Saved Info'
+          
         #create an image for getting RGB values
         #self.image = PNMImage()
         #tex.store(self.image)
@@ -36,7 +64,7 @@ class OverlayTool(object):
         self.lastY = 0
         
         #"status bar" label
-        self.statusPrefix = 'Pres H for help\nClipboard: '
+        self.statusPrefix = 'Pres H for help\n%s: ' % self.clipText
         
         #texture stuff
         self.tex.setMagfilter(Texture.FTNearest)
@@ -85,7 +113,8 @@ class OverlayTool(object):
         #TODO: simply scale the pointer based on mouse measure
         #TODO: shift / alt to create rows / heights -- simply scale and then scale back when key is released
                     
-        labelFont = TextOverlay.loadFont("/c/Windows/Fonts/arial.ttf", size=13)
+        labelFont = TextOverlay.loadFont("res/DejaVuSans.ttf", size=13)
+        monoFont = TextOverlay.loadFont("res/DejaVuSansMono.ttf", size=13)
         
         #we can use this to avoid having to pass it to all TextOverlays
         TextOverlay.defaultFont = labelFont
@@ -102,17 +131,17 @@ class OverlayTool(object):
         TextOverlay.setFontSize(labelFont, 13)
         
         #now let's create some text on top
-        self.text = TextOverlay(msg=self.statusPrefix, color=Vec4(0, 0, 0, 1))
+        self.text = TextOverlay(msg=self.statusPrefix)
         self.text.reparentTo(self.pixel2d)
         self.text.setZIndex(10)
         
         #some text to display coordinates
-        self.coordsText = TextOverlay(msg="(0, 0)", color=Vec4(0, 0, 0, 1))
+        self.coordsText = TextOverlay(msg="(0, 0)", font=monoFont)
         self.coordsText.setPos(5, 5)
         self.coordsText.reparentTo(self.pixel2d)
         self.coordsText.setZIndex(10)
         
-        self.sizeText = TextOverlay(color=Vec4(0, 0, 0, 1))
+        self.sizeText = TextOverlay(font=monoFont)
         self.sizeText.setPos(5, self.coordsText.getSize()[1]+10)
         self.sizeText.reparentTo(self.pixel2d)
         self.sizeText.setZIndex(10)
@@ -231,7 +260,7 @@ class OverlayTool(object):
                 str = ' '.join((str, ''))
             self.text.textGen.setText(str)
             self.text.generate()
-            self.setClipboard(win32con.CF_TEXT, str[str.rfind(':'):].lstrip())
+            self.clipboard.set(str[str.rfind(':'):].lstrip())
         
     #TODO: Output modes:
     # NOT REALLY IMPORTANT, because most uses will be for THEMES rather than raw Overlays
@@ -240,7 +269,7 @@ class OverlayTool(object):
     #  Clipboard: corners=(5, 12) texcoords=(0, 0, 50, 50) size=(25, 25)
     
     def pushClipboard(self):
-        str = self.getClipboard()
+        str = self.clipboard.get()
         nx, ny = 0, 0
         if self.measureDrag:
             nx, ny = self.measureWidth, self.measureHeight
@@ -249,12 +278,12 @@ class OverlayTool(object):
         
         delim = ' x ' if self.measureDrag else ', '
         pStr = '(%d%s%d)' % (nx, delim, ny)
-        self.setClipboard(win32con.CF_TEXT, ' '.join((str, pStr)))
+        self.clipboard.set(' '.join((str, pStr)))
         self.text.textGen.appendText('%s ' % pStr)
         self.text.generate()
     
     def clearClipboard(self):
-        self.setClipboard(win32con.CF_TEXT, "")
+        self.clipboard.set("")
         if self.text.textGen.getText() != self.statusPrefix:
             self.text.textGen.setText(self.statusPrefix)
             self.text.generate()
@@ -407,22 +436,21 @@ class OverlayTool(object):
             self.helpOverlay.node.hide()
 
 
-if __name__ == '__main__':
-    import direct.directbase.DirectStart
-    from direct.task import Task
-
-    import sys
-    import math
-    
-    from overlays import *
-    import win32clipboard as w
-    import win32con
+if __name__ == '__main__':        
+    noclip = False
+    if '-noclip' in sys.argv:
+        noclip = True
+        sys.argv.remove('-noclip')
+    clipboard = EmptyClipboard() if noclip else WinClipboard()
     
     if len(sys.argv) <= 1:
         #debug
+        print 'Format:'
+        print '    overlaytool [-noclip] myTexture.png'
+        print
+        print 'Reverting to res/simple_ui.png'
         sys.argv.append('res/simple_ui.png')
-        print 'Format:\n    overlaytool myTexture.png'
+        
     tex = loader.loadTexture(sys.argv[1])
-    print tex.getXSize(), tex.getYSize()
-    o = OverlayTool(tex)
+    o = OverlayTool(tex, clipboard)
     run()

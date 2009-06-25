@@ -15,9 +15,10 @@ myMsg = ''.join(('Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                ' Ut elementum mauris vitae dui luctus aliquet.',
                ' Phasellus consequat sodales rhoncus.'))
 
-myFont = overlays.TextOverlay.loadFont('res/Aller_Rg.ttf', size=12) 
-text = overlays.TextOverlay(msg=myMsg, font=myFont, 
-                            color=Vec4(0.2,0.2,0.2,1), wordwrap=200)
+
+myFont = overlays.TextOverlay.loadFont('res/DejaVuSans.ttf', size=11) 
+text = overlays.TextOverlay(msg=myMsg, font=myFont,
+                            color=Vec4(0.2,0.2,0.2,1), wordwrap=250)
 text.reparentTo(pixel2d)
 
 pad = 5

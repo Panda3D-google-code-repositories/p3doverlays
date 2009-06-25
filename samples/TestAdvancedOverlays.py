@@ -53,7 +53,7 @@ class TestAdvancedOverlays:
         self.panelBg.setPos(-self.insets[1], -self.insets[0])
         
         #Convenience method to load a crisp font at size 14 pt
-        font = hud.TextOverlay.loadFont('res/Aller_Rg.ttf', size=14)
+        font = hud.TextOverlay.loadFont('res/DejaVuSans.ttf', size=12)
         hud.TextOverlay.defaultFont = font
         
         #Write some instructions

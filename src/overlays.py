@@ -503,9 +503,9 @@ class TextOverlay(OverlayContainer):
     """
     
     def __init__(self, name=None, msg=None, textSize=AUTO_SIZE,
-                 textGen=None, font=None, color=Vec4(1, 1, 1, 1), 
+                 textGen=None, font=None, color=Vec4(0, 0, 0, 1), 
                  align=TextNode.ALeft, wordwrap=None, trimHeight=True, 
-                 generate=True):
+                 generate=True, xOff=0, yOff=0):
         OverlayContainer.__init__(self, name, noNode=True)
                 
         self.node = NodePath(self.name)
@@ -555,13 +555,13 @@ class TextOverlay(OverlayContainer):
         self.textSize = size
         
         if self.text is not None:
-            scale = self.getTextSize() #gets the scale
+            scale = float(self.getTextSize()) #gets the scale
             self.text.setScale(scale, 1, -scale)
             yoff = 0
             if self.trimHeight:
                 yoff = self.lineHeightExtra()
             off = self.textGen.getTop() * scale - yoff
-            self.text.setPos(0, 0, off)
+            self.text.setPos(0, 0, round(off))
     
     def getTextSize(self):
         """ Returns the text size, or attempts to find it if
@@ -634,12 +634,12 @@ class TextOverlay(OverlayContainer):
             w = self.textGen.getWordwrap() * ppu
         else:
             w = self.textGen.getWidth() * ppu
-        yoff = 0
+        yoff = self.lineHeightExtra()
         #HACK: add a little for the bottom bit (below baseline) so that
         #the font won't spill out of the returned height
         # For now we will use the 'extra line height', which seems to work
         #well, but if the user requested trimHeight be turned off, then we
         #can simply ignore this
         if not self.trimHeight:
-            yoff = self.lineHeightExtra()
-        return round(w), round(h+yoff)
+            yoff = 0
+        return round(w), round(h-yoff)
