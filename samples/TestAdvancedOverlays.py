@@ -46,7 +46,7 @@ class TestAdvancedOverlays:
         tex.setMagfilter(Texture.FTNearest)
         self.panelBg = hud.OverlaySlice9(texture=tex, 
                                          texcoords=(0, 0, 54, 53),
-                                         border=(9, 9, 11, 10))
+                                         edges=(9, 9, 11, 10))
         self.panelBg.node.setColor(self.upColor)
         self.panelBg.reparentTo(panel)
         self.panelBg.setZIndex(-10)

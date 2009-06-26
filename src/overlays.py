@@ -3,7 +3,8 @@ from pandac.PandaModules import *
 class GeomEdit:
     """ A base class used only for editing geometry made with GeomGen. """
     
-    def startGeom(self, hasColor=False, texture=None):
+    def startGeom(self, hasColor=False, texture=None, lines=False):
+        self.lines = lines
         self.texture = texture
     def endGeom(self, nodeName):
         return None
@@ -13,31 +14,38 @@ class GeomEdit:
         ``color`` is ignored when editing.
         """
         z = 0
-        y = -y
-        ys = -ys
-        vertex.addData3f(Vec3(x, z, y))
-        vertex.addData3f(Vec3(x+xs, z, y))
-        vertex.addData3f(Vec3(x+xs, z, y+ys))
-        vertex.addData3f(Vec3(x, z, y+ys))
+        if not self.lines:
+            y = -y
+            ys = -ys
+            vertex.addData3f(Vec3(x, z, y))
+            vertex.addData3f(Vec3(x+xs, z, y))
+            vertex.addData3f(Vec3(x+xs, z, y+ys))
+            vertex.addData3f(Vec3(x, z, y+ys))
+        else:
+            vertex.addData3f(Vec3(x, z, y))
+            vertex.addData3f(Vec3(xs, z, ys))
         
 class GeomGen(GeomEdit):
     """ Used for initially generating geometry. """
     
-    def startGeom(self, hasColor=False, texture=None):
+    def startGeom(self, hasColor=False, texture=None, lines=False):
         """
         Called to start creating card geometry. 
         Vertex colours will not be stored if hasColor is left False; this 
         will result in a single-colour geometry. To colour sub-cards differently, 
         use has hasColor=True.
+        
+        Set ``lines`` to ``True`` to draw lines instead of triangles.
         """
+        self.lines = lines
         self.texture = texture
         self.hasColor = hasColor
         format = GeomVertexFormat.getV3c4t2() if hasColor else GeomVertexFormat.getV3t2()
         self.vdata = GeomVertexData('quad', format, Geom.UHStatic)
         self.vertex = GeomVertexWriter(self.vdata, 'vertex')
         self.pigment = None if not hasColor else GeomVertexWriter(self.vdata, 'color')
-        self.uv = GeomVertexWriter(self.vdata, 'texcoord')
-        self.prim = GeomTriangles(Geom.UHStatic)
+        self.uv = GeomVertexWriter(self.vdata, 'texcoord') if not lines else None
+        self.prim = GeomTriangles(Geom.UHStatic) if not lines else GeomLines(Geom.UHStatic)
         self.n = 0
     
     def next(self, x, y, xs, ys, uvdata=None, vertex=None, color=None):
@@ -54,11 +62,16 @@ class GeomGen(GeomEdit):
         
         When generating, ``vertex`` is generally not used (unless a different vertex 
         writer is desired).
+        
+        .. note::
+            When drawing lines, ``(x, y)`` are the start points and ``(xs, ys)`` 
+            are the end points.
         """
         
         #write vertex data using parent class
         if vertex is None:
             vertex = self.vertex
+        
         GeomEdit.next(self, x, y, xs, ys, uvdata, vertex, color)
         
         #write the rest of the data
@@ -67,25 +80,31 @@ class GeomGen(GeomEdit):
         if self.hasColor:
             self.pigment.addData4f(color)
             self.pigment.addData4f(color)
-            self.pigment.addData4f(color)
-            self.pigment.addData4f(color)
-        u, v, us, vs = 0, -0, 1, -1
-        if uvdata is not None and self.texture is not None:
-            #1,1  0,1  0,0  1,0
-            tx = float(self.texture.getXSize())
-            ty = float(self.texture.getYSize())
-            u, v, us, vs = uvdata
-            u, v, us, vs = (u)/tx, 1-(v)/ty, (us+1)/tx, 1-(vs+1)/ty
+            if not self.lines:
+                self.pigment.addData4f(color)
+                self.pigment.addData4f(color)
+       
+        if not self.lines:
+            u, v, us, vs = 0, -0, 1, -1
+            if uvdata is not None and self.texture is not None:
+                #1,1  0,1  0,0  1,0
+                tx = float(self.texture.getXSize())
+                ty = float(self.texture.getYSize())
+                u, v, us, vs = uvdata
+                u, v, us, vs = (u)/tx, 1-(v)/ty, (us+1)/tx, 1-(vs+1)/ty
+            self.uv.addData2f(u,v)
+            self.uv.addData2f(us,v)
+            self.uv.addData2f(us,vs)
+            self.uv.addData2f(u,vs)
             
-        self.uv.addData2f(u,v)
-        self.uv.addData2f(us,v)
-        self.uv.addData2f(us,vs)
-        self.uv.addData2f(u,vs)
-        
-        self.prim.addVertices(self.n, self.n+1, self.n+2)
-        self.prim.addVertices(self.n+2, self.n+3, self.n)
-        self.prim.closePrimitive()
-        self.n += 4
+            self.prim.addVertices(self.n, self.n+1, self.n+2)
+            self.prim.addVertices(self.n+2, self.n+3, self.n)
+            self.prim.closePrimitive()
+            self.n += 4
+        else:
+            self.prim.addVertices(self.n, self.n+1)
+            self.prim.closePrimitive()
+            self.n += 2
         
     def endGeom(self, nodeName):
         """
@@ -101,7 +120,7 @@ class GeomGen(GeomEdit):
         nodepath.attachNewNode(node)
         if self.texture is not None:
             nodepath.setTexture(self.texture)
-        nodepath.setTransparency(False)
+        nodepath.setTransparency(True)
         nodepath.setDepthWrite(False)
         nodepath.setDepthTest(False)
         nodepath.setTwoSided(True)
@@ -131,7 +150,9 @@ class OverlayContainer(object):
         self.name = name
         self.node = None if noNode else NodePath(self.name)
         self.x, self.y = 0, 0
-        self.setZIndex(0)
+        self.order = 0
+        if self.node is not None:
+            self.node.setBin('fixed', self.order)
         
     def setZIndex(self, order):
         """ Sets the z-Index (depth) of this overlay. Higher numbers brings an
@@ -237,22 +258,54 @@ class Overlay(OverlayContainer):
     geomEdit = GeomEdit()
         
     def __init__(self, name=None, size=(0, 0), texture=None, 
-                 texcoords=None, color=None):
+                 texcoords=None, color=None, flip=True):
         OverlayContainer.__init__(self, name, noNode=True)
         
+        self.border = None
+        """ An optional 'border' to match to this overlay. """
         self.texture = texture
         self.width, self.height = size
         self.node = self._draw(Overlay.geomGen, self.width, self.height, texcoords)
-        self.node.setTransparency(True)
         if color is not None:
             self.node.setColor(color)
         self.xScale, self.yScale = 1, 1
-        self.node.setScale(self.xScale, 1, -self.yScale)
-        
+        self.yScaleMult = -1 if flip else 1
+        self.node.setScale(self.xScale, 1, self.yScaleMult*self.yScale)
+    
     def _draw(self, geom, width, height, texcoords=None, vertex=None):
         geom.startGeom(hasColor=False, texture=self.texture)
         geom.next(0, 0, width, height, texcoords, vertex)
         return geom.endGeom(self.name)
+    
+    def setBorder(self, border):
+        """ 
+        Borders are any type of overlay that stays in front of this
+        overlay and should be resized, repositioned and rescaled whenever
+        this overlay changes. They are ideal for line borders, as the name
+        suggests. 
+        
+        This method is different from simply changing the ``border`` attribute,
+        as it immediately attempts to match the border to this overlay.
+        """
+        self.border = border
+        if border is not None:
+            self.border.setZIndex(self.getZIndex()+1)
+            x, y = self.getPos()
+            self.border.setPos(x, y)
+            w, h = self.getSize()
+            self.border.setSize(w, h)
+            x, y = self.getScale()
+            self.border.setScale(x, y)
+        
+    def setZIndex(self, order):
+        OverlayContainer.setZIndex(self, order)
+        if self.border is not None:
+            self.border.setZIndex(order+1)
+    
+    def setPos(self, x, y):
+        OverlayContainer.setPos(self, x, y)
+        if self.border is not None:
+            self.border.setPos(x, y)
     
     def setScale(self, xScale, yScale):
         """
@@ -261,7 +314,9 @@ class Overlay(OverlayContainer):
         """
         self.xScale = xScale
         self.yScale = yScale
-        self.node.setScale(xScale, 1, -yScale)
+        self.node.setScale(xScale, 1, self.yScaleMult*yScale)
+        if self.border is not None:
+            self.border.setScale(xScale, yScale)
     
     def getScale(self):
         """ Returns the scale of the overlay. """
@@ -277,6 +332,8 @@ class Overlay(OverlayContainer):
             self.width = width
             self.height = height
             self._draw(Overlay.geomEdit, width, height, vertex=vertex)
+        if self.border is not None:
+            self.border.setSize(width, height)
     
     def getSize(self):
         """ Returns the size of this overlay in pixels, as a tuple of width, height. """
@@ -288,20 +345,20 @@ class OverlaySlice3(Overlay):
     along one axis without quality loss.
     
     Sliced overlays are a single geometry with multiple parts. 3-sliced
-    geometries use 3 parts: the center and its two borders. This overlay is useful
+    geometries use 3 parts: the center and its two edges. This overlay is useful
     for elements such as scrollbars and sliders.
      
     The ``texcoords`` argument is a tuple of the upper-left and lower-right pixels
-    to slice. The default width/height of the ``border`` is 5, and it's assumed
+    to slice. The default width/height of the ``edges`` is 5, and it's assumed
     that there are no gaps between parts. The actual texture coordinates of each
-    part will be determined based on the given ``border`` and ``texcoords`` values, and
+    part will be determined based on the given ``edges`` and ``texcoords`` values, and
     whether or not the result should be ``horizontal``.
     """
     
     def __init__(self, name=None, size=(0, 0), texture=None, 
-                 border=5, texcoords=None, horizontal=True,
+                 edges=5, texcoords=None, horizontal=True,
                  color1=Vec4(1, 1, 1, 1), color2=Vec4(.75, .75, .75, 1)):
-        self.border = border
+        self.edges = edges
         self.horizontal = horizontal
         self.color1 = color1
         self.color2 = color2
@@ -312,31 +369,31 @@ class OverlaySlice3(Overlay):
         hasTex = texcoords is not None and self.texture is not None
         if hasTex:
             x1, y1, x2, y2 = texcoords
-            #TODO: support tuple of borders for greater flexibility
+            #TODO: support tuple of edgess for greater flexibility
             if self.horizontal:
-                uv1 = (x1, y1, x1+self.border-1, y2)
-                uv2 = (x1+self.border, y1, x2-self.border, y2)
-                uv3 = (x2-self.border+1, y1, x2, y2)
+                uv1 = (x1, y1, x1+self.edges-1, y2)
+                uv2 = (x1+self.edges, y1, x2-self.edges, y2)
+                uv3 = (x2-self.edges+1, y1, x2, y2)
             else:
-                uv1 = (x1, y1, x2, y1+self.border-1)
-                uv2 = (x1, y1+self.border, x2, y2-self.border)
-                uv3 = (x1, y2-self.border+1, x2, y2)
+                uv1 = (x1, y1, x2, y1+self.edges-1)
+                uv2 = (x1, y1+self.edges, x2, y2-self.edges)
+                uv3 = (x1, y2-self.edges+1, x2, y2)
         #helpful for debugging
         colr1 = None if hasTex else self.color1
         colr2 = None if hasTex else self.color2 
         
         geom.startGeom(hasColor=not hasTex, texture=self.texture)
         if self.horizontal:
-            geom.next(0, 0, self.border, height, uv1, vertex, colr1)
-            geom.next(self.border, 0, width-self.border*2, height, 
+            geom.next(0, 0, self.edges, height, uv1, vertex, colr1)
+            geom.next(self.edges, 0, width-self.edges*2, height, 
                       uv2, vertex, colr2)
-            geom.next(width-self.border, 0, self.border, height, 
+            geom.next(width-self.edges, 0, self.edges, height, 
                       uv3, vertex, colr1)
         else:
-            geom.next(0, 0, width, self.border, uv1, vertex, colr1)
-            geom.next(0, self.border, width, height-self.border*2, 
+            geom.next(0, 0, width, self.edges, uv1, edges, colr1)
+            geom.next(0, self.edges, width, height-self.edges*2, 
                       uv2, vertex, colr2)
-            geom.next(0, height-self.border, width, self.border, 
+            geom.next(0, height-self.edges, width, self.edges, 
                       uv3, vertex, colr1)
         return geom.endGeom(self.name)
     
@@ -350,24 +407,25 @@ class OverlaySlice9(Overlay):
     This overlay is useful for elements such as dialogs, buttons and decorated panels.
      
     The ``texcoords`` argument is a tuple of the upper-left and lower-right pixels
-    to slice. The default size of the ``border`` edges is 5, and it's assumed
+    to slice. The default size of each edge is 5, and it's assumed
     that there are no gaps between parts. The actual texture coordinates of each
-    part will be determined based on the given ``border`` and ``texcoords`` values.
+    part will be determined based on the given ``edges`` and ``texcoords`` values.
     
-    Unlike 3-sliced overlays, 9-slicing uses a more flexible ``border`` to support
-    edges of different sizes. It expects a tuple of `(top, left, bottom, right)` edges,
+    Unlike 3-sliced overlays, 9-slicing uses more flexible ``edges`` to support
+    different sizes. It expects a tuple of ``(top, left, bottom, right)`` edges,
     or a single number to use for all edges.
     """
     
     def __init__(self, name=None, size=(0, 0), texture=None, 
-                 border=5, texcoords=None, color1=Vec4(1, 1, 1, 1), 
+                 edges=5, texcoords=None,
+                 color1=Vec4(1, 1, 1, 1), 
                  color2=Vec4(.75, .75, .75, 1)):
         self.color1 = color1
         self.color2 = color2
-        if not isinstance(border, tuple):
-            border = border, border, border, border
-        self.border = border
-        self.top, self.left, self.bottom, self.right = self.border
+        if not isinstance(edges, tuple):
+            edges = edges, edges, edges, edges
+        self.edges = edges
+        self.top, self.left, self.bottom, self.right = self.edges
         Overlay.__init__(self, name, size, texture, texcoords)
     
     def _draw(self, geom, width, height, texcoords=None, vertex=None):
@@ -417,6 +475,23 @@ class OverlaySlice9(Overlay):
                   uvbottom, vertex, colr2)
         geom.next(w-self.right, by, self.right, self.bottom, uvbr, 
                   vertex, colr1)
+        return geom.endGeom(self.name)
+
+class LineBorder(Overlay):
+    """
+    A rectangle drawn with the given colour, to make a line border.
+    """
+    
+    def __init__(self, name=None, size=(0, 0), color=Vec4(0, 0, 0, 1)):
+        Overlay.__init__(self, name, size, color=color, flip=False)
+        
+    def _draw(self, geom, w, h, texcoords=None, vertex=None):
+        geom.startGeom(hasColor=False, lines=True)
+        w -= 1
+        geom.next(0, 1, w+1, 1, vertex=vertex)
+        geom.next(w, 1, w, h, vertex=vertex)
+        geom.next(w, h, 0, h, vertex=vertex)
+        geom.next(0, 0, 0, h, vertex=vertex)            
         return geom.endGeom(self.name)
 
 class TextOverlay(OverlayContainer):

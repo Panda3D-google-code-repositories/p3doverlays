@@ -1,5 +1,6 @@
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
+from direct.task import Task
 
 import overlays
 
@@ -10,6 +11,16 @@ box1.reparentTo(pixel2d)
 box1.setZIndex(-1)
 box1.setPos(50, 50)
 
+textColor = Vec4(0.2,0.2,0.2,1)
+
+#white border.. be sure to add it to the scene!
+bord = overlays.LineBorder(color=textColor)
+bord.reparentTo(pixel2d)
+
+#overlays have an optional 'border', which is really any overlay
+#that ought to always be in front with matching size/scale/position 
+box1.setBorder(bord)
+
 myMsg = ''.join(('Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                ' Aenean at orci nulla. Fusce eu dignissim ligula.',
                ' Ut elementum mauris vitae dui luctus aliquet.',
@@ -18,7 +29,7 @@ myMsg = ''.join(('Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 
 myFont = overlays.TextOverlay.loadFont('res/DejaVuSans.ttf', size=11) 
 text = overlays.TextOverlay(msg=myMsg, font=myFont,
-                            color=Vec4(0.2,0.2,0.2,1), wordwrap=250)
+                            color=textColor, wordwrap=250)
 text.reparentTo(pixel2d)
 
 pad = 5

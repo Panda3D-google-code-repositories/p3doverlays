@@ -123,13 +123,13 @@ work with pixels made this tool *very* easy to write.
 
 Windows users can run it from the command-line like so::
 
-    overlaytool.py TEXTURE
+    python overlaytool.py TEXTURE
 
 Where TEXTURE is the texture to load, such as ``res/img.png``.
 
 If you aren't using Windows, you can turn off the clipboard with the -noclip option::
 
-    overlaytool.py -noclip TETURE
+    python overlaytool.py -noclip TEXTURE
 
 .. note:: 
     You can use the ``R``, ``-`` and ``+`` keys instead of the
