@@ -157,7 +157,13 @@ class OverlayContainer(object):
     
     def setBorder(self, border, padding=0):
         """ Helper method to quickly set a 'border' overlay which is 
-        resized, rescaled and repositioned whenever this overlay is changed. """
+        resized, rescaled and repositioned whenever this overlay is changed. 
+        
+        The ``padding`` can be specified to add spacing between. You can also
+        use a negative padding. 
+        
+        Borders are generally not supported by ``OverlayContainers``, but by
+        classes which inherit from it. """
         self.border = border
         self.borderPadding = padding
         self.updateBorder()
