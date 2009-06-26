@@ -18,11 +18,10 @@ Now we can create a red overlay and reparent it to ``pixel2d``::
     
     box1 = overlays.Overlay(color=Vec4(.9, .7, .7, 1))
     box1.reparentTo(pixel2d)
-    box1.setZIndex(-1)
     box1.setPos(50, 50)
     
-The above is just a simple geometry (a 'card') that is coloured red. We've
-also set it's depth to -1, so that it appears behind the text. We've positioned it
+The above is just a simple geometry (a 'card') that is coloured red. Since it's the
+first child of pixel2d, it will appear behind other overlays. We've positioned it
 to (50, 50) screen space. Since the overlay has no size, you wouldn't see anything
 if you tried running the example now. Let's add some text::
 
@@ -71,7 +70,6 @@ such as:
 * Mouse picking at an overlay's 'absolute screen positions'
 * Slicing a texture to create a resizable 2D element
 * Grouping overlays with OverlayContainer
-* Ordering overlays with z-index
 * Regenerating text overlays
 
 .. image:: tut2.png
@@ -131,6 +129,6 @@ If you aren't using Windows, you can turn off the clipboard with the -noclip opt
 
     python overlaytool.py -noclip TEXTURE
 
-.. note:: 
-    You can use the ``R``, ``-`` and ``+`` keys instead of the
+.. note::
+    You can use the ``'R'``, ``'W'`` and ``'S'`` keys instead of the
     middle mouse button and mouse wheel up/down.

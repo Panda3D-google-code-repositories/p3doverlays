@@ -8,17 +8,16 @@ pixel2d = overlays.PixelNode('g2d')
 
 box1 = overlays.Overlay(color=Vec4(.9, .7, .7, 1))
 box1.reparentTo(pixel2d)
-box1.setZIndex(-1)
 box1.setPos(50, 50)
 
 textColor = Vec4(0.2,0.2,0.2,1)
 
-#white border.. be sure to add it to the scene!
+#create a border and add it to the scene
 bord = overlays.LineBorder(color=textColor)
 bord.reparentTo(pixel2d)
 
-#overlays have an optional 'border', which is really any overlay
-#that ought to always be in front with matching size/scale/position 
+#overlays have an optional 'border' -- an overlay that
+#is resized/rescaled/repositioned to match changes
 box1.setBorder(bord)
 
 myMsg = ''.join(('Lorem ipsum dolor sit amet, consectetur adipiscing elit.',

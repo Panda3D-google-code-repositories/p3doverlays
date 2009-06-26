@@ -1,7 +1,3 @@
-"""
-
-"""
-
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
 from direct.task import Task
@@ -49,7 +45,6 @@ class TestAdvancedOverlays:
                                          edges=(9, 9, 11, 10))
         self.panelBg.node.setColor(self.upColor)
         self.panelBg.reparentTo(panel)
-        self.panelBg.setZIndex(-10)
         self.panelBg.setPos(-self.insets[1], -self.insets[0])
         
         #Convenience method to load a crisp font at size 14 pt

@@ -107,6 +107,11 @@ or other node-related methods will raise exceptions.</dd></dl>
 in pixels.</dd></dl>
 
 <dl class="method">
+<dt id="overlays.OverlayContainer.getScale">
+<tt class="descname">getScale</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.getScale" title="Permalink to this definition">¶</a></dt>
+<dd>Returns the scale of the overlay.</dd></dl>
+
+<dl class="method">
 <dt id="overlays.OverlayContainer.getZIndex">
 <tt class="descname">getZIndex</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.getZIndex" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the z-Index (depth) of this overlay.</dd></dl>
@@ -115,6 +120,12 @@ in pixels.</dd></dl>
 <dt id="overlays.OverlayContainer.reparentTo">
 <tt class="descname">reparentTo</tt><big>(</big><em>parent</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.reparentTo" title="Permalink to this definition">¶</a></dt>
 <dd>Moves this overlay under the given parent node or overlay.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.OverlayContainer.setBorder">
+<tt class="descname">setBorder</tt><big>(</big><em>border</em>, <em>padding=0</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setBorder" title="Permalink to this definition">¶</a></dt>
+<dd>Helper method to quickly set a &#8216;border&#8217; overlay which is 
+resized, rescaled and repositioned whenever this overlay is changed.</dd></dl>
 
 <dl class="method">
 <dt id="overlays.OverlayContainer.setPos">
@@ -130,15 +141,20 @@ allows us to set its position in screen-space coordinates.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="overlays.OverlayContainer.setScale">
+<tt class="descname">setScale</tt><big>(</big><em>xScale</em>, <em>yScale</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setScale" title="Permalink to this definition">¶</a></dt>
+<dd>Applies the given scale to the overlay, where (1, 1) is a 100% x 
+and y scale (normal).</dd></dl>
+
+<dl class="method">
 <dt id="overlays.OverlayContainer.setZIndex">
-<tt class="descname">setZIndex</tt><big>(</big><em>order</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setZIndex" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">setZIndex</tt><big>(</big><em>zIndex</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setZIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the z-Index (depth) of this overlay. Higher numbers brings an
 item closer to the front.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This will not affect OverlayContainers, only texture and text based
-overlays. Under the hood, this simply calls <tt class="docutils literal"><span class="pre">setBin('fixed',</span> <span class="pre">order)</span></tt> 
-on the node.</p>
+<p class="last">This will have no effect on an OverlayContainer. Under the hood, this 
+simply calls <tt class="docutils literal"><span class="pre">setBin('fixed',</span> <span class="pre">zIndex)</span></tt> on the node.</p>
 </div>
 </dd></dl>
 
@@ -163,20 +179,9 @@ resulting NodePath.</p>
 <p>The <tt class="docutils literal"><span class="pre">texcoords</span></tt> parameter is a tuple of texture coordinates given in pixels,
 see the tutorials for further details.</p>
 <dl class="method">
-<dt id="overlays.Overlay.getScale">
-<tt class="descname">getScale</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.Overlay.getScale" title="Permalink to this definition">¶</a></dt>
-<dd>Returns the scale of the overlay.</dd></dl>
-
-<dl class="method">
 <dt id="overlays.Overlay.getSize">
 <tt class="descname">getSize</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.Overlay.getSize" title="Permalink to this definition">¶</a></dt>
 <dd>Returns the size of this overlay in pixels, as a tuple of width, height.</dd></dl>
-
-<dl class="method">
-<dt id="overlays.Overlay.setScale">
-<tt class="descname">setScale</tt><big>(</big><em>xScale</em>, <em>yScale</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setScale" title="Permalink to this definition">¶</a></dt>
-<dd>Applies the given scale to the overlay, where (1, 1) is a 100% x 
-and y scale (normal).</dd></dl>
 
 <dl class="method">
 <dt id="overlays.Overlay.setSize">
@@ -191,17 +196,17 @@ and y scale (normal).</dd></dl>
 <dl class="class">
 <dt id="overlays.OverlaySlice3">
 <em class="property">
-class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlaySlice3</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>border=5</em>, <em>texcoords=None</em>, <em>horizontal=True</em>, <em>color1=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>color2=Vec4(0.75</em>, <em>0.75</em>, <em>0.75</em>, <em>1)</em><big>)</big><a class="headerlink" href="#overlays.OverlaySlice3" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlaySlice3</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>edges=5</em>, <em>texcoords=None</em>, <em>horizontal=True</em>, <em>color1=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>color2=Vec4(0.75</em>, <em>0.75</em>, <em>0.75</em>, <em>1)</em><big>)</big><a class="headerlink" href="#overlays.OverlaySlice3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a title="overlays.Overlay" class="reference internal" href="#overlays.Overlay"><tt class="xref docutils literal"><span class="pre">overlays.Overlay</span></tt></a></p>
 <p>Creates a sliced overlay with the given options, for scaling
 along one axis without quality loss.</p>
 <p>Sliced overlays are a single geometry with multiple parts. 3-sliced
-geometries use 3 parts: the center and its two borders. This overlay is useful
+geometries use 3 parts: the center and its two edges. This overlay is useful
 for elements such as scrollbars and sliders.</p>
 <p>The <tt class="docutils literal"><span class="pre">texcoords</span></tt> argument is a tuple of the upper-left and lower-right pixels
-to slice. The default width/height of the <tt class="docutils literal"><span class="pre">border</span></tt> is 5, and it&#8217;s assumed
+to slice. The default width/height of the <tt class="docutils literal"><span class="pre">edges</span></tt> is 5, and it&#8217;s assumed
 that there are no gaps between parts. The actual texture coordinates of each
-part will be determined based on the given <tt class="docutils literal"><span class="pre">border</span></tt> and <tt class="docutils literal"><span class="pre">texcoords</span></tt> values, and
+part will be determined based on the given <tt class="docutils literal"><span class="pre">edges</span></tt> and <tt class="docutils literal"><span class="pre">texcoords</span></tt> values, and
 whether or not the result should be <tt class="docutils literal"><span class="pre">horizontal</span></tt>.</p>
 </dd></dl>
 
@@ -211,7 +216,7 @@ whether or not the result should be <tt class="docutils literal"><span class="pr
 <dl class="class">
 <dt id="overlays.OverlaySlice9">
 <em class="property">
-class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlaySlice9</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>border=5</em>, <em>texcoords=None</em>, <em>color1=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>color2=Vec4(0.75</em>, <em>0.75</em>, <em>0.75</em>, <em>1)</em><big>)</big><a class="headerlink" href="#overlays.OverlaySlice9" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlaySlice9</tt><big>(</big><em>name=None</em>, <em>size=(0</em>, <em>0)</em>, <em>texture=None</em>, <em>edges=5</em>, <em>texcoords=None</em>, <em>color1=Vec4(1</em>, <em>1</em>, <em>1</em>, <em>1)</em>, <em>color2=Vec4(0.75</em>, <em>0.75</em>, <em>0.75</em>, <em>1)</em><big>)</big><a class="headerlink" href="#overlays.OverlaySlice9" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a title="overlays.Overlay" class="reference internal" href="#overlays.Overlay"><tt class="xref docutils literal"><span class="pre">overlays.Overlay</span></tt></a></p>
 <p>Creates a sliced overlay with the given options, for scaling
 along X and Y axis without quality loss.</p>
@@ -219,11 +224,11 @@ along X and Y axis without quality loss.</p>
 geometries use 9 parts: four corners, the center and the surrounding edges. 
 This overlay is useful for elements such as dialogs, buttons and decorated panels.</p>
 <p>The <tt class="docutils literal"><span class="pre">texcoords</span></tt> argument is a tuple of the upper-left and lower-right pixels
-to slice. The default size of the <tt class="docutils literal"><span class="pre">border</span></tt> edges is 5, and it&#8217;s assumed
+to slice. The default size of each edge is 5, and it&#8217;s assumed
 that there are no gaps between parts. The actual texture coordinates of each
-part will be determined based on the given <tt class="docutils literal"><span class="pre">border</span></tt> and <tt class="docutils literal"><span class="pre">texcoords</span></tt> values.</p>
-<p>Unlike 3-sliced overlays, 9-slicing uses a more flexible <tt class="docutils literal"><span class="pre">border</span></tt> to support
-edges of different sizes. It expects a tuple of <cite>(top, left, bottom, right)</cite> edges,
+part will be determined based on the given <tt class="docutils literal"><span class="pre">edges</span></tt> and <tt class="docutils literal"><span class="pre">texcoords</span></tt> values.</p>
+<p>Unlike 3-sliced overlays, 9-slicing uses more flexible <tt class="docutils literal"><span class="pre">edges</span></tt> to support
+different sizes. It expects a tuple of <tt class="docutils literal"><span class="pre">(top,</span> <span class="pre">left,</span> <span class="pre">bottom,</span> <span class="pre">right)</span></tt> edges,
 or a single number to use for all edges.</p>
 </dd></dl>
 
@@ -372,6 +377,11 @@ for static fonts).</p>
 <tt class="descname">setWordwrap</tt><big>(</big><em>wordwrap</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setWordwrap" title="Permalink to this definition">¶</a></dt>
 <dd>Sets the wordwrap, in pixels.</dd></dl>
 
+<dl class="method">
+<dt id="overlays.TextOverlay.setZIndex">
+<tt class="descname">setZIndex</tt><big>(</big><em>zIndex</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setZIndex" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the fixed bin order of the text node, as well as the container.</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -403,15 +413,22 @@ world space in order to take full advantage of Node.setPos().</p>
 <p>Once all sub-cards have been added, generate the Node via _endGeometry.</p>
 <p>When generating, <tt class="docutils literal"><span class="pre">vertex</span></tt> is generally not used (unless a different vertex 
 writer is desired).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When drawing lines, <tt class="docutils literal"><span class="pre">(x,</span> <span class="pre">y)</span></tt> are the start points and <tt class="docutils literal"><span class="pre">(xs,</span> <span class="pre">ys)</span></tt> 
+are the end points.</p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="overlays.GeomGen.startGeom">
-<tt class="descname">startGeom</tt><big>(</big><em>hasColor=False</em>, <em>texture=None</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.startGeom" title="Permalink to this definition">¶</a></dt>
-<dd>Called to start creating card geometry. 
+<tt class="descname">startGeom</tt><big>(</big><em>hasColor=False</em>, <em>texture=None</em>, <em>lines=False</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.startGeom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called to start creating card geometry. 
 Vertex colours will not be stored if hasColor is left False; this 
 will result in a single-colour geometry. To colour sub-cards differently, 
-use has hasColor=True.</dd></dl>
+use has hasColor=True.</p>
+<p>Set <tt class="docutils literal"><span class="pre">lines</span></tt> to <tt class="xref docutils literal"><span class="pre">True</span></tt> to draw lines instead of triangles.</p>
+</dd></dl>
 
 </dd></dl>
 

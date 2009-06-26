@@ -54,7 +54,8 @@ class OverlayTool(object):
         self.shiftDown = False
         self.clipboard = clipboard
         self.clipText = 'Clipboard' if clipboard.supported() else 'Saved Info'
-          
+        self.transparencyEnabled = False
+        
         #create an image for getting RGB values
         #self.image = PNMImage()
         #tex.store(self.image)
@@ -166,8 +167,8 @@ class OverlayTool(object):
         zout = [-1, lambda s: s >= self.zoomMin]
         base.accept('wheel_up', self.zoom, zin)
         base.accept('wheel_down', self.zoom, zout)
-        base.accept('=', self.zoom, zin)   #support mice w/o wheels
-        base.accept('-', self.zoom, zout)
+        base.accept('w', self.zoom, zin)   #support mice w/o wheels
+        base.accept('s', self.zoom, zout)
         base.accept('space', self.pushClipboard)
         base.accept('backspace', self.popClipboard)
         base.accept('delete', self.popClipboard)
@@ -184,6 +185,7 @@ class OverlayTool(object):
         base.accept('shift-up', self.setShowGridRow, [False])
         base.accept('alt', self.setShowGridCol, [True])
         base.accept('alt-up', self.setShowGridCol, [False])
+        base.accept('t', self.toggleTransparency)
         
         taskMgr.add(self.MouseMotionTask, "MouseMotionTask")
     
@@ -211,7 +213,8 @@ class OverlayTool(object):
                     + '\1h\1Shift / Alt -\2 toggle row/column guides\n' \
                     + '\1h\1Space -\2 add point or size to clipboard\n' \
                     + '\1h\1Delete -\2 remove last clipboard entry\n' \
-                    + '\1h\1Escape -\2 reset the clipboard\n\n' \
+                    + '\1h\1Escape -\2 reset the clipboard\n' \
+                    + '\1h\1T -\2 toggle transparency\n\n' \
                     + 'The Overlay Tool helps you quickly visualize and' \
                     + ' set up texture atlas coordinates for your overlays.'
         
@@ -248,6 +251,13 @@ class OverlayTool(object):
         self.textBG.setPos(0, winy-self.textBG.getSize()[1])
         self.helpOverlay.setPos(winx/2-self.helpWidth/2, 
                                 winy/2-self.helpHeight/2)
+        
+    def toggleTransparency(self):
+        self.transparencyEnabled = not self.transparencyEnabled
+        if self.transparencyEnabled:
+            self.overlayBG.node.hide()
+        else:
+            self.overlayBG.node.show()
         
     def popClipboard(self):
         str = self.text.textGen.getText()

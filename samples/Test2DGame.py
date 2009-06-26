@@ -1,8 +1,3 @@
-'''
-Created on 19-Jun-09
-
-@author: Matt
-'''
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
 from direct.task import Task
@@ -16,6 +11,9 @@ base.setBackgroundColor(.7, .7, .7, 1)
 
 #root node for overlays
 pixel2d = overlays.PixelNode('g2d')
+
+box = overlays.Overlay(size=(300, 300), color=Vec4(0.2, 0.7, 0.2, 1)) 
+box.reparentTo(pixel2d)
 
 fnt = overlays.TextOverlay.loadFont('res/DejaVuSans.ttf', size=12)
 text = overlays.TextOverlay(msg='Press space to walk', font=fnt)
@@ -42,10 +40,6 @@ right_walk2 = addSoldierState(70, 39, 85, 66)
 right_idle.node.show()
 
 soldier.setPos(50, 50)
-
-box = overlays.Overlay(size=(300, 300), color=Vec4(0.2, 0.7, 0.2, 1)) 
-box.setZIndex(-1)
-box.reparentTo(pixel2d)
 
 moving = False
 timer = 0

@@ -15,8 +15,6 @@ class GeomEdit:
         """
         z = 0
         if not self.lines:
-            y = -y
-            ys = -ys
             vertex.addData3f(Vec3(x, z, y))
             vertex.addData3f(Vec3(x+xs, z, y))
             vertex.addData3f(Vec3(x+xs, z, y+ys))
@@ -125,7 +123,7 @@ class GeomGen(GeomEdit):
         nodepath.setDepthTest(False)
         nodepath.setTwoSided(True)
         nodepath.setAttrib(LightAttrib.makeAllOff())
-        nodepath.setBin("fixed", 0)
+        nodepath.setBin('fixed', 0)
         return nodepath
 
 class OverlayContainer(object):
@@ -150,22 +148,37 @@ class OverlayContainer(object):
         self.name = name
         self.node = None if noNode else NodePath(self.name)
         self.x, self.y = 0, 0
-        self.order = 0
+        self.zIndex = 0
+        self.xScale, self.yScale = 1, 1
+        self.border = None
+        self.borderPadding = 0
         if self.node is not None:
-            self.node.setBin('fixed', self.order)
+            self.node.setBin('fixed', self.zIndex)
+    
+    def setBorder(self, border, padding=0):
+        """ Helper method to quickly set a 'border' overlay which is 
+        resized, rescaled and repositioned whenever this overlay is changed. """
+        self.border = border
+        self.borderPadding = padding
+        self.updateBorder()
+    
+    def updateBorder(self):
+        x, y = self.getPos()
+        self.border.setPos(x-self.borderPadding, y-self.borderPadding)
+        xs, ys = self.getScale()
+        self.border.setScale(xs, ys)
         
-    def setZIndex(self, order):
+    def setZIndex(self, zIndex):
         """ Sets the z-Index (depth) of this overlay. Higher numbers brings an
         item closer to the front.
         
         .. note:: 
-            This will not affect OverlayContainers, only texture and text based
-            overlays. Under the hood, this simply calls ``setBin('fixed', order)`` 
-            on the node.
+            This will have no effect on an OverlayContainer. Under the hood, this 
+            simply calls ``setBin('fixed', zIndex)`` on the node. 
         """
-        self.zIndex = order
+        self.zIndex = zIndex
         if self.node is not None:
-            self.node.setBin('fixed', order)
+            self.node.setBin('fixed', zIndex)
     
     def getZIndex(self):
         """ Returns the z-Index (depth) of this overlay. """
@@ -192,6 +205,8 @@ class OverlayContainer(object):
         self.y = y
         if self.node is not None: 
             self.node.setPos(x, 0, y)
+        if self.border is not None:
+            self.updateBorder()
     
     def getPos(self):
         """ Returns the position of this overlay as a tuple of ``(x, y)``,
@@ -205,7 +220,22 @@ class OverlayContainer(object):
                 self.node.reparentTo(parent.node)
             else:
                 self.node.reparentTo(parent)
-       
+    
+    def setScale(self, xScale, yScale):
+        """
+        Applies the given scale to the overlay, where (1, 1) is a 100% x 
+        and y scale (normal).
+        """
+        self.xScale = xScale
+        self.yScale = yScale
+        self.node.setScale(xScale, 1, yScale)
+        if self.border is not None:
+            self.updateBorder()
+    
+    def getScale(self):
+        """ Returns the scale of the overlay. """
+        return self.xScale, self.yScale
+    
 class PixelNode(NodePath, OverlayContainer):
     """
     PixelNode is the root node for all overlays (and 2D elements in general). 
@@ -258,70 +288,24 @@ class Overlay(OverlayContainer):
     geomEdit = GeomEdit()
         
     def __init__(self, name=None, size=(0, 0), texture=None, 
-                 texcoords=None, color=None, flip=True):
-        OverlayContainer.__init__(self, name, noNode=True)
-        
-        self.border = None
-        """ An optional 'border' to match to this overlay. """
+                 texcoords=None, color=None):
+        OverlayContainer.__init__(self, name)
         self.texture = texture
-        self.width, self.height = size
+        self.width, self.height = size        
         self.node = self._draw(Overlay.geomGen, self.width, self.height, texcoords)
         if color is not None:
             self.node.setColor(color)
-        self.xScale, self.yScale = 1, 1
-        self.yScaleMult = -1 if flip else 1
-        self.node.setScale(self.xScale, 1, self.yScaleMult*self.yScale)
     
     def _draw(self, geom, width, height, texcoords=None, vertex=None):
         geom.startGeom(hasColor=False, texture=self.texture)
         geom.next(0, 0, width, height, texcoords, vertex)
         return geom.endGeom(self.name)
     
-    def setBorder(self, border):
-        """ 
-        Borders are any type of overlay that stays in front of this
-        overlay and should be resized, repositioned and rescaled whenever
-        this overlay changes. They are ideal for line borders, as the name
-        suggests. 
-        
-        This method is different from simply changing the ``border`` attribute,
-        as it immediately attempts to match the border to this overlay.
-        """
-        self.border = border
-        if border is not None:
-            self.border.setZIndex(self.getZIndex()+1)
-            x, y = self.getPos()
-            self.border.setPos(x, y)
-            w, h = self.getSize()
-            self.border.setSize(w, h)
-            x, y = self.getScale()
-            self.border.setScale(x, y)
-        
-    def setZIndex(self, order):
-        OverlayContainer.setZIndex(self, order)
-        if self.border is not None:
-            self.border.setZIndex(order+1)
+    def updateBorder(self):
+        OverlayContainer.updateBorder(self)
+        w, h = self.getSize()
+        self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
     
-    def setPos(self, x, y):
-        OverlayContainer.setPos(self, x, y)
-        if self.border is not None:
-            self.border.setPos(x, y)
-    
-    def setScale(self, xScale, yScale):
-        """
-        Applies the given scale to the overlay, where (1, 1) is a 100% x 
-        and y scale (normal).
-        """
-        self.xScale = xScale
-        self.yScale = yScale
-        self.node.setScale(xScale, 1, self.yScaleMult*yScale)
-        if self.border is not None:
-            self.border.setScale(xScale, yScale)
-    
-    def getScale(self):
-        """ Returns the scale of the overlay. """
-        return self.xScale, self.yScale
-        
     def setSize(self, width, height):
         """ Sets the size of this overlay in pixels. """ 
         if self.width != width or self.height != height:
@@ -333,7 +317,7 @@ class Overlay(OverlayContainer):
             self.height = height
             self._draw(Overlay.geomEdit, width, height, vertex=vertex)
         if self.border is not None:
-            self.border.setSize(width, height)
+            self.updateBorder()
     
     def getSize(self):
         """ Returns the size of this overlay in pixels, as a tuple of width, height. """
@@ -483,7 +467,7 @@ class LineBorder(Overlay):
     """
     
     def __init__(self, name=None, size=(0, 0), color=Vec4(0, 0, 0, 1)):
-        Overlay.__init__(self, name, size, color=color, flip=False)
+        Overlay.__init__(self, name, size, color=color)
         
     def _draw(self, geom, w, h, texcoords=None, vertex=None):
         geom.startGeom(hasColor=False, lines=True)
@@ -581,14 +565,10 @@ class TextOverlay(OverlayContainer):
                  textGen=None, font=None, color=Vec4(0, 0, 0, 1), 
                  align=TextNode.ALeft, wordwrap=None, trimHeight=True, 
                  generate=True, xOff=0, yOff=0):
-        OverlayContainer.__init__(self, name, noNode=True)
-                
-        self.node = NodePath(self.name)
-        """ A node which contains the text node. """
         self.text = None
         """ The panda node generated from ``TextNode``. """
         
-        self.setZIndex(0)
+        OverlayContainer.__init__(self, name)
         
         tnn = '%s_text' % self.name
         self.textGen = textGen or TextNode(tnn)
@@ -608,11 +588,18 @@ class TextOverlay(OverlayContainer):
             self.setWordwrap(wordwrap)
         if generate and msg is not None:
             self.generate()
+        
+    def updateBorder(self):
+        OverlayContainer.updateBorder(self)
+        w, h = self.getSize()
+        self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
     
     def setWordwrap(self, wordwrap):
         """ Sets the wordwrap, in pixels. """
         self.wordwrap = wordwrap
         self.textGen.setWordwrap(wordwrap / self.getTextSize())
+        if self.border is not None:
+            self.updateBorder()
     
     def getWordwrap(self):
         """ Returns the wordwrap, in pixels. """
@@ -637,6 +624,8 @@ class TextOverlay(OverlayContainer):
                 yoff = self.lineHeightExtra()
             off = self.textGen.getTop() * scale - yoff
             self.text.setPos(0, 0, round(off))
+            if self.border is not None:
+                self.updateBorder()
     
     def getTextSize(self):
         """ Returns the text size, or attempts to find it if
@@ -692,7 +681,18 @@ class TextOverlay(OverlayContainer):
             tw = f.getPageXSize()
             th = f.getPageYSize()
             self.text.setTexOffset(TextureStage.getDefault(), 0.4/tw, -0.4/th)
+        self.text.setDepthWrite(False)
+        self.text.setDepthTest(False)
+        self.text.setTwoSided(True)
+        self.text.setAttrib(LightAttrib.makeAllOff())
+        self.text.setBin('fixed', self.getZIndex())
         self.setTextSize(self.textSize)
+        
+    def setZIndex(self, zIndex):
+        """ Sets the fixed bin order of the text node, as well as the container. """
+        OverlayContainer.setZIndex(self, zIndex)
+        if self.text is not None:
+            self.text.setBin('fixed', zIndex)
         
     def getSize(self):
         """ Returns the size of the text node, in pixels. If
