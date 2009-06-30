@@ -14,7 +14,7 @@ textColor = Vec4(0.2,0.2,0.2,1)
 
 #create a border and add it to the scene
 bord = overlays.LineBorder(color=textColor)
-bord.reparentTo(pixel2d)
+bord.reparentTo(box1)
 
 #overlays have an optional 'border' -- an overlay that
 #is resized/rescaled/repositioned to match changes
@@ -29,11 +29,11 @@ myMsg = ''.join(('Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 myFont = overlays.TextOverlay.loadFont('res/DejaVuSans.ttf', size=11) 
 text = overlays.TextOverlay(msg=myMsg, font=myFont,
                             color=textColor, wordwrap=250)
-text.reparentTo(pixel2d)
+text.reparentTo(box1)
 
 pad = 5
 x, y = box1.getPos()
-text.setPos(x+pad, y+pad)
+text.setPos(pad, pad)
 
 w, h = text.getSize()
 box1.setSize(w+pad*2, h+pad*2)

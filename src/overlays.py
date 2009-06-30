@@ -141,7 +141,7 @@ class OverlayContainer(object):
     After you call this constructor, you can use ``self.name`` to retrieve
     the potentially generated name.
     """
-    def __init__(self, name=None, noNode=False):
+    def __init__(self, name=None, noNode=False, flip=False):
     
         if name is None:
             name = '%s%i' % (self.__class__.__name__, id(self))
@@ -150,30 +150,12 @@ class OverlayContainer(object):
         self.x, self.y = 0, 0
         self.zIndex = 0
         self.xScale, self.yScale = 1, 1
-        self.border = None
-        self.borderPadding = 0
+        self.flip = flip
+        self.yMult = -1 if flip else 1
         if self.node is not None:
+            self.node.setScale(self.xScale, 1, self.yScale*self.yMult)
             self.node.setBin('fixed', self.zIndex)
-    
-    def setBorder(self, border, padding=0):
-        """ Helper method to quickly set a 'border' overlay which is 
-        resized, rescaled and repositioned whenever this overlay is changed. 
-        
-        The ``padding`` can be specified to add spacing between. You can also
-        use a negative padding. 
-        
-        Borders are generally not supported by ``OverlayContainers``, but by
-        classes which inherit from it. """
-        self.border = border
-        self.borderPadding = padding
-        self.updateBorder()
-    
-    def updateBorder(self):
-        x, y = self.getPos()
-        self.border.setPos(x-self.borderPadding, y-self.borderPadding)
-        xs, ys = self.getScale()
-        self.border.setScale(xs, ys)
-        
+            
     def setZIndex(self, zIndex):
         """ Sets the z-Index (depth) of this overlay. Higher numbers brings an
         item closer to the front.
@@ -211,8 +193,6 @@ class OverlayContainer(object):
         self.y = y
         if self.node is not None: 
             self.node.setPos(x, 0, y)
-        if self.border is not None:
-            self.updateBorder()
     
     def getPos(self):
         """ Returns the position of this overlay as a tuple of ``(x, y)``,
@@ -229,14 +209,12 @@ class OverlayContainer(object):
     
     def setScale(self, xScale, yScale):
         """
-        Applies the given scale to the overlay, where (1, 1) is a 100% x 
-        and y scale (normal).
+        Applies the given scale to the overlay, where (1, 1) is 100% x 
+        and y scale (default).
         """
         self.xScale = xScale
         self.yScale = yScale
-        self.node.setScale(xScale, 1, yScale)
-        if self.border is not None:
-            self.updateBorder()
+        self.node.setScale(xScale, 1, yScale*self.yMult)
     
     def getScale(self):
         """ Returns the scale of the overlay. """
@@ -296,9 +274,12 @@ class Overlay(OverlayContainer):
     def __init__(self, name=None, size=(0, 0), texture=None, 
                  texcoords=None, color=None):
         OverlayContainer.__init__(self, name)
+        self.border = None
+        self.borderPadding = 0
         self.texture = texture
-        self.width, self.height = size        
+        self.width, self.height = size  
         self.node = self._draw(Overlay.geomGen, self.width, self.height, texcoords)
+        self.geom = self.node.getChildren()[0]
         if color is not None:
             self.node.setColor(color)
     
@@ -307,21 +288,47 @@ class Overlay(OverlayContainer):
         geom.next(0, 0, width, height, texcoords, vertex)
         return geom.endGeom(self.name)
     
+    def setBorder(self, border, padding=0):
+        """ Helper method to quickly set a 'border' overlay which is 
+        resized, rescaled and repositioned whenever this overlay is changed. 
+        
+        The ``padding`` can be specified to add spacing between. You can also
+        use a negative padding. 
+        
+        Borders are generally not supported by ``OverlayContainers``, but by
+        classes which inherit from it. """
+        self.border = border
+        self.borderPadding = padding
+        if self.border is not None:
+            self.updateBorder()
+    
     def updateBorder(self):
-        OverlayContainer.updateBorder(self)
+        self.border.setPos(-self.borderPadding, -self.borderPadding)
+        xs, ys = self.getScale()
+        self.border.setScale(xs, ys)
         w, h = self.getSize()
         self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
     
     def setSize(self, width, height):
         """ Sets the size of this overlay in pixels. """ 
         if self.width != width or self.height != height:
-            vdata = self.node.getChildren()[0].node().modifyGeom(0).modifyVertexData()
+            vdata = self.geom.node().modifyGeom(0).modifyVertexData()
             vertex = GeomVertexWriter(vdata, 'vertex')
             vertex.setRow(0)
             vertex.setColumn(0)
             self.width = width
             self.height = height
             self._draw(Overlay.geomEdit, width, height, vertex=vertex)
+        if self.border is not None:
+            self.updateBorder()
+    
+    def setPos(self, x, y):
+        OverlayContainer.setPos(self, x, y)
+        if self.border is not None:
+            self.updateBorder()
+    
+    def setScale(self, xScale, yScale):
+        OverlayContainer.setScale(self, xScale, yScale)
         if self.border is not None:
             self.updateBorder()
     
@@ -487,8 +494,7 @@ class LineBorder(Overlay):
 class TextOverlay(OverlayContainer):
     """ 
     TextOverlay provides a simple manner of displaying crisp text as an overlay.
-    Each text overlay contains: a TextNode for generation, a 'top' node, and the
-    actual text node (if it exists) parented to the 'top node'.
+    Each text overlay contains ``node``, a NodePath generated from the TextNode. 
     
     Overlays use pixelsPerUnit and scaling to generate crisp text. For the best 
     results, you should set the overlay's text size (i.e. text scale) to match 
@@ -501,10 +507,7 @@ class TextOverlay(OverlayContainer):
     A font height of 1.0 is a Panda standard, and using different values 
     (such as using font.setPointSize, which adjusts the height internally) may
     create undesired results with TextOverlay.
-    
-    If ``msg`` is specified and ``generate`` is not ``False``, a text node will be 
-    generated after the properties are set. 
-    
+        
     If no ``textGen`` is specified, one will be created. Likewise, if ``font`` is not 
     specified, the ``defaultFont`` will be used if it has been set, otherwise 
     ``textGen``'s default font will be used. The ``color`` is the color for the text
@@ -568,53 +571,77 @@ class TextOverlay(OverlayContainer):
     """
     
     def __init__(self, name=None, msg=None, textSize=AUTO_SIZE,
-                 textGen=None, font=None, color=Vec4(0, 0, 0, 1), 
+                 textNode=None, font=None, color=Vec4(0, 0, 0, 1), 
                  align=TextNode.ALeft, wordwrap=None, trimHeight=True, 
-                 generate=True, xOff=0, yOff=0):
-        self.text = None
-        """ The panda node generated from ``TextNode``. """
-        
-        OverlayContainer.__init__(self, name)
-        
+                 xOff=0, yOff=0):
+        OverlayContainer.__init__(self, name, noNode=True, flip=True)
+                
         tnn = '%s_text' % self.name
-        self.textGen = textGen or TextNode(tnn)
-        self.textGen.setName(tnn)
+        self.textNode = textNode or TextNode(tnn)
+        self.textNode.setName(tnn)
         
         self.trimHeight = trimHeight
-        self.setTextSize(textSize)
         
         font = TextOverlay.defaultFont if font is None else font
         if font is not None:
-            self.textGen.setFont(font)
+            self.textNode.setFont(font)
         if msg is not None:
-            self.textGen.setText(msg)
-        self.textGen.setAlign(align)
-        self.textGen.setTextColor(color)
+            self.textNode.setText(msg)
+        self.textNode.setAlign(align)
+        self.textNode.setTextColor(color)
+        self.node = NodePath(self.textNode)
+        self.node.setDepthWrite(False)
+        self.node.setDepthTest(False)
+        self.node.setTwoSided(True)
+        self.node.setAttrib(LightAttrib.makeAllOff())
+        self.node.setBin('fixed', self.getZIndex())
+        self.updateTexOffset()
+        self.setTextSize(textSize)
         if wordwrap is not None:
             self.setWordwrap(wordwrap)
-        if generate and msg is not None:
-            self.generate()
-        
-    def updateBorder(self):
-        OverlayContainer.updateBorder(self)
-        w, h = self.getSize()
-        self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
+    
+    def updateTexOffset(self):
+        f = self.textNode.getFont()
+        if isinstance(f, DynamicTextFont):
+            tw = f.getPageXSize()
+            th = f.getPageYSize()
+            self.node.clearTexTransform()
+            self.node.setTexOffset(TextureStage.getDefault(), 0.4/tw, -0.4/th)
+    
+    def setText(self, msg):
+        self.textNode.setText(msg)
+        self.textChanged()
+    
+    def getText(self):
+        return self.textNode.getText()
+    
+    def setFont(self, font):
+        self.textNode.setFont(font)
+        self.textChanged()
+        self.updateTexOffset()
+    
+    def getFont(self):
+        return self.textNode.getFont()
+    
+    def textChanged(self):
+        """ The text has changed -- reposition it for the parent overlay. """
+        x, y = self.getPos()
+        self.setPos(x, y)
     
     def setWordwrap(self, wordwrap):
         """ Sets the wordwrap, in pixels. """
         self.wordwrap = wordwrap
-        self.textGen.setWordwrap(wordwrap / self.getTextSize())
-        if self.border is not None:
-            self.updateBorder()
-    
+        self.textNode.setWordwrap(wordwrap / float(self.xScale))
+        self.textChanged()
+        
     def getWordwrap(self):
         """ Returns the wordwrap, in pixels. """
         return self.wordwrap
     
     def setTextSize(self, size):
         """ 
-        Sets the scale of the text node and repositions it
-        to fit in the upper left (0, 0) of the parent node.
+        Sets the scale of the text node and repositions it vertically to 
+        fit the new size.
         
         If size is :const:`AUTO_SIZE`, it will attempt to resize the text
         to the current font's pixels per units (or default to size 30 
@@ -622,22 +649,15 @@ class TextOverlay(OverlayContainer):
         """
         self.textSize = size
         
-        if self.text is not None:
-            scale = float(self.getTextSize()) #gets the scale
-            self.text.setScale(scale, 1, -scale)
-            yoff = 0
-            if self.trimHeight:
-                yoff = self.lineHeightExtra()
-            off = self.textGen.getTop() * scale - yoff
-            self.text.setPos(0, 0, round(off))
-            if self.border is not None:
-                self.updateBorder()
-    
+        scale = float(self.getTextSize()) #gets the scale
+        self.setScale(scale, scale)
+        self.textChanged()
+            
     def getTextSize(self):
         """ Returns the text size, or attempts to find it if
         :func:`isAutoSize` returns ``True``. """
         if self.isAutoSize():
-            f = self.textGen.getFont()
+            f = self.textNode.getFont()
             if isinstance(f, DynamicTextFont):
                 return f.getPixelsPerUnit()
             else:
@@ -648,58 +668,25 @@ class TextOverlay(OverlayContainer):
     def isAutoSize(self):
         """ Returns ``True`` if :data:`AUTO_SIZE` is on. """
         return self.textSize == TextOverlay.AUTO_SIZE
+        
+    def setPos(self, x, y):
+        yoff = 0
+        if self.trimHeight:
+            yoff = self.lineHeightExtra()
+        off = round(self.textNode.getTop() * self.yScale - yoff)
+        OverlayContainer.setPos(self, x, y+off)
+        self.y = y
     
     def lineHeightExtra(self):
         """ Returns the line height minus 1.0 (standard Panda text height) in pixels. """
-        f = self.textGen.getFont()
-        return (f.getLineHeight() - 1.0) * self.getTextSize()
+        f = self.textNode.getFont()
+        return (f.getLineHeight() - 1.0) * self.yScale
     
     def destroy(self):
         """ Destroys this overlay. """
-        self.destroyText()
-        self.textGen.removeNode()
-        self.textGen = None
+        self.textNode = None
         OverlayContainer.destroy(self)
     
-    def detachText(self):
-        """ Detaches the rendered text node without destroying it, returning
-        the text node or None if one did not exist. This also sets this overlay's
-        text node to None. """
-        if self.text is not None:
-            self.text.detachNode()
-            self.text = None
-        
-    def destroyText(self):
-        """ Destroys the text node (not the textGen) if it exists. """
-        if self.text is not None:
-            self.text.removeNode()
-            self.text = None
-    
-    def generate(self):
-        """ Destroys the last text node and generates a new node using 
-        this overlay's textGen. The new node will be resized to the
-        current text size. """
-        self.destroyText()
-        self.text = NodePath(self.textGen.generate())
-        self.text.reparentTo(self.node)
-        f = self.textGen.getFont()
-        if isinstance(f, DynamicTextFont):
-            tw = f.getPageXSize()
-            th = f.getPageYSize()
-            self.text.setTexOffset(TextureStage.getDefault(), 0.4/tw, -0.4/th)
-        self.text.setDepthWrite(False)
-        self.text.setDepthTest(False)
-        self.text.setTwoSided(True)
-        self.text.setAttrib(LightAttrib.makeAllOff())
-        self.text.setBin('fixed', self.getZIndex())
-        self.setTextSize(self.textSize)
-        
-    def setZIndex(self, zIndex):
-        """ Sets the fixed bin order of the text node, as well as the container. """
-        OverlayContainer.setZIndex(self, zIndex)
-        if self.text is not None:
-            self.text.setBin('fixed', zIndex)
-        
     def getSize(self):
         """ Returns the size of the text node, in pixels. If
         word-wrapping is set on the textGen, it will be assumed to be the
@@ -709,12 +696,13 @@ class TextOverlay(OverlayContainer):
         setScale() if you wish to scale the overlay, setTextScale() to set
         point size, or use word-wrapping to set the text box width in pixels 
         (and the height will be computed accordingly). """
+        xs, ys = self.xScale, self.yScale
         ppu = self.getTextSize()
-        h = self.textGen.getHeight() * ppu
-        if self.textGen.hasWordwrap():
-            w = self.textGen.getWordwrap() * ppu
+        h = self.textNode.getHeight() * ys
+        if self.textNode.hasWordwrap():
+            w = self.textNode.getWordwrap() * xs
         else:
-            w = self.textGen.getWidth() * ppu
+            w = self.textNode.getWidth() * xs
         yoff = self.lineHeightExtra()
         #HACK: add a little for the bottom bit (below baseline) so that
         #the font won't spill out of the returned height

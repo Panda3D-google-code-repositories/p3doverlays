@@ -19,13 +19,13 @@ class TestAdvancedOverlays:
         self.hoverColor = Vec4(1, 1, 1, 1)
         self.upColor = Vec4(1, 1, 1, 0.5)
         self.inside = False
-        
+                
         base.setBackgroundColor(Vec4(1, 1, 1, 1))
         
         #Since the texture has irregular insets (for the drop shadow)
         #we will need to offset the background to make the text fit nicely.
         #We can also use this for a more exact rollover effect
-        self.insets = (0, 2, 4, 3)
+        self.insets = (1, 2, 4, 3)
         
         #Initialize a 'pixel node' which overlays will be reparented to
         #This inherits from both OverlayContainer and NodePath
@@ -47,9 +47,10 @@ class TestAdvancedOverlays:
         self.panelBg.reparentTo(panel)
         self.panelBg.setPos(-self.insets[1], -self.insets[0])
         
-        #Convenience method to load a crisp font at size 14 pt
-        font = hud.TextOverlay.loadFont('res/DejaVuSans.ttf', size=12)
-        hud.TextOverlay.defaultFont = font
+        #Convenience method to load a crisp font at size 12 pt
+        self.font = hud.TextOverlay.loadFont('res/DejaVuSans.ttf', size=12)
+        self.mono = hud.TextOverlay.loadFont('res/DejaVuSansMono.ttf', size=12)
+        hud.TextOverlay.defaultFont = self.font
         
         #Write some instructions
         txt = hud.TextOverlay(msg="Click the box to change its width",
@@ -69,7 +70,7 @@ class TestAdvancedOverlays:
                                         wordwrap=self.wordwrap1)
         self.panelTxt.reparentTo(panel)
         self.panelTxt.setPos(self.padding, self.padding)
-        
+                
         self.setRollover(False)
         
         #resize the bg panel to the text
@@ -100,10 +101,9 @@ class TestAdvancedOverlays:
         if self.inside:
             is1 = self.panelTxt.getWordwrap() == self.wordwrap1
             ww = self.wordwrap2 if is1 else self.wordwrap1
-             
+            
             #update the text
             self.panelTxt.setWordwrap(ww)
-            self.panelTxt.generate()
             
             #resize the background to the new text size
             self.updateBoxSize()

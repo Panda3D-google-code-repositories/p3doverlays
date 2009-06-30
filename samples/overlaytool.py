@@ -129,8 +129,8 @@ class OverlayTool(object):
         
         #sets the font size to use in generating text
         #will do nothing unless createHelpOverlay() changes the font size
-        TextOverlay.setFontSize(labelFont, 13)
-        
+        #TextOverlay.setFontSize(labelFont, 13)
+           
         #now let's create some text on top
         self.text = TextOverlay(msg=self.statusPrefix)
         self.text.reparentTo(self.pixel2d)
@@ -143,7 +143,7 @@ class OverlayTool(object):
         self.coordsText.setZIndex(10)
         
         self.sizeText = TextOverlay(font=monoFont)
-        self.sizeText.setPos(5, self.coordsText.getSize()[1]+10)
+        self.sizeText.setPos(5, self.coordsText.getSize()[1]+12)
         self.sizeText.reparentTo(self.pixel2d)
         self.sizeText.setZIndex(10)
         
@@ -260,7 +260,7 @@ class OverlayTool(object):
             self.overlayBG.node.show()
         
     def popClipboard(self):
-        str = self.text.textGen.getText()
+        str = self.text.getText()
         x = str.rfind('(')
         if x != -1:
             str = str[:x].rstrip()
@@ -268,8 +268,7 @@ class OverlayTool(object):
             x = str.rfind('(')
             if x == -1:
                 str = ' '.join((str, ''))
-            self.text.textGen.setText(str)
-            self.text.generate()
+            self.text.setText(str)
             self.clipboard.set(str[str.rfind(':'):].lstrip())
         
     #TODO: Output modes:
@@ -289,14 +288,12 @@ class OverlayTool(object):
         delim = ' x ' if self.measureDrag else ', '
         pStr = '(%d%s%d)' % (nx, delim, ny)
         self.clipboard.set(' '.join((str, pStr)))
-        self.text.textGen.appendText('%s ' % pStr)
-        self.text.generate()
+        self.text.textNode.appendText('%s ' % pStr)
     
     def clearClipboard(self):
         self.clipboard.set("")
-        if self.text.textGen.getText() != self.statusPrefix:
-            self.text.textGen.setText(self.statusPrefix)
-            self.text.generate()
+        if self.text.getText() != self.statusPrefix:
+            self.text.setText(self.statusPrefix)
     
     def zoom(self, mult, func):
         oldS,ys = self.overlay.getScale()
@@ -330,9 +327,8 @@ class OverlayTool(object):
             self.measureWidth = abs(xSize)
             self.measureHeight = abs(ySize)
             str = 'Size: %d x %d' % ( self.measureWidth, self.measureHeight )
-            if self.sizeText.textGen.getText() != str:
-                self.sizeText.textGen.setText(str)
-                self.sizeText.generate()
+            if self.sizeText.getText() != str:
+                self.sizeText.setText(str)
         else:
             self.pointer.setPos(nx + ox, ny + oy)
         
@@ -349,9 +345,8 @@ class OverlayTool(object):
         #    rgbStr = ', rgb=(%d, %d, %d)' % rgb
         
         str = '(%d, %d)' % (pixelX, pixelY) 
-        if self.coordsText.textGen.getText() != str:
-            self.coordsText.textGen.setText(str)
-            self.coordsText.generate()
+        if self.coordsText.getText() != str:
+            self.coordsText.setText(str)
         
     def setShowGridRow(self, b):
         self.shiftDown = b
@@ -434,9 +429,8 @@ class OverlayTool(object):
             self.pointer.setScale(self.lastPointerScale, 
                                   self.lastPointerScale)            
             self.move_pointer(self.lastX, self.lastY)
-            if self.sizeText.textGen.getText() != "":
-                self.sizeText.textGen.setText("")
-                self.sizeText.generate()
+            if self.sizeText.getText() != "":
+                self.sizeText.setText("")
     
     def toggleHelp(self):
         self.helpVisible = not self.helpVisible
