@@ -268,10 +268,10 @@ regardless of its pixels per unit.</p>
 <p>A font height of 1.0 is a Panda standard, and using different values 
 (such as using font.setPointSize, which adjusts the height internally) may
 create undesired results with TextOverlay.</p>
-<p>If no <tt class="docutils literal"><span class="pre">textGen</span></tt> is specified, one will be created. Likewise, if <tt class="docutils literal"><span class="pre">font</span></tt> is not 
+<p>If no <tt class="docutils literal"><span class="pre">textNode</span></tt> is specified, one will be created. Likewise, if <tt class="docutils literal"><span class="pre">font</span></tt> is not 
 specified, the <tt class="docutils literal"><span class="pre">defaultFont</span></tt> will be used if it has been set, otherwise 
-<tt class="docutils literal"><span class="pre">textGen</span></tt>&#8216;s default font will be used. The <tt class="docutils literal"><span class="pre">color</span></tt> is the color for the text
-generator, as is <tt class="docutils literal"><span class="pre">align</span></tt> and <tt class="docutils literal"><span class="pre">wordwrap</span></tt>.</p>
+<tt class="docutils literal"><span class="pre">textNode</span></tt>&#8216;s default font will be used. The <tt class="docutils literal"><span class="pre">color</span></tt> is the color for the text
+node, as is <tt class="docutils literal"><span class="pre">align</span></tt> and <tt class="docutils literal"><span class="pre">wordwrap</span></tt>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Wordwrap is given in pixels, and it is assumed to be the desired width
@@ -341,11 +341,6 @@ for convenience.</p>
 main description for details.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="overlays.TextOverlay.setBorder">
-<tt class="descname">setBorder</tt><big>(</big><em>border</em>, <em>borderPadding=0</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setBorder" title="Permalink to this definition">¶</a></dt>
-<dd>Not yet supported with TextOverlay.</dd></dl>
-
 <dl class="staticmethod">
 <dt id="overlays.TextOverlay.setFontSize">
 <em class="property">
@@ -367,6 +362,11 @@ that no associations to the old font pages stay around.</p>
 <dd>Deprecated; does nothing.</dd></dl>
 
 <dl class="method">
+<dt id="overlays.TextOverlay.setText">
+<tt class="descname">setText</tt><big>(</big><em>msg</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setText" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the text and repositions the node according to the new height.</dd></dl>
+
+<dl class="method">
 <dt id="overlays.TextOverlay.setTextSize">
 <tt class="descname">setTextSize</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setTextSize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the scale of the text node and repositions it vertically to 
@@ -385,6 +385,12 @@ for static fonts).</p>
 <dt id="overlays.TextOverlay.textChanged">
 <tt class="descname">textChanged</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.textChanged" title="Permalink to this definition">¶</a></dt>
 <dd>The text has changed &#8211; reposition it for the parent overlay.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.TextOverlay.updateTexOffset">
+<tt class="descname">updateTexOffset</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.updateTexOffset" title="Permalink to this definition">¶</a></dt>
+<dd>Forces the text to update its texture offsets; this fixes a bug in
+Panda 1.6.2.</dd></dl>
 
 </dd></dl>
 

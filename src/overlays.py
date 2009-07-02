@@ -549,10 +549,10 @@ class TextOverlay(OverlayContainer):
     (such as using font.setPointSize, which adjusts the height internally) may
     create undesired results with TextOverlay.
         
-    If no ``textGen`` is specified, one will be created. Likewise, if ``font`` is not 
+    If no ``textNode`` is specified, one will be created. Likewise, if ``font`` is not 
     specified, the ``defaultFont`` will be used if it has been set, otherwise 
-    ``textGen``'s default font will be used. The ``color`` is the color for the text
-    generator, as is ``align`` and ``wordwrap``.
+    ``textNode``'s default font will be used. The ``color`` is the color for the text
+    node, as is ``align`` and ``wordwrap``.
     
     .. note::
         Wordwrap is given in pixels, and it is assumed to be the desired width
@@ -641,12 +641,11 @@ class TextOverlay(OverlayContainer):
         if wordwrap is not None:
             self.setWordwrap(wordwrap)
     
-    
-    def setBorder(self, border, borderPadding=0):
-        """ Not yet supported with TextOverlay. """
-        print "setBorder isn't yet supported with TextOverlay"
-        
     def updateTexOffset(self):
+        """ 
+        Forces the text to update its texture offsets; this fixes a bug in
+        Panda 1.6.2.
+        """
         f = self.textNode.getFont()
         if isinstance(f, DynamicTextFont):
             tw = f.getPageXSize()
@@ -655,13 +654,19 @@ class TextOverlay(OverlayContainer):
             self.node.setTexOffset(TextureStage.getDefault(), 0.4/tw, -0.4/th)
     
     def setText(self, msg):
+        """
+        Sets the text and repositions the node according to its new height.
+        """
         self.textNode.setText(msg)
         self.textChanged()
     
     def getText(self):
+        """ Calls ``textNode.getText()``. """
         return self.textNode.getText()
     
     def setFont(self, font):
+        """ Sets a new font for this overlay, updates this overlay's scale, 
+        updates the node position, and updates the texture offsets. """
         self.textNode.setFont(font)
         scale = float(self.getTextSize())
         self.setScale(scale, scale)
@@ -669,6 +674,7 @@ class TextOverlay(OverlayContainer):
         self.updateTexOffset()
     
     def getFont(self):
+        """ Calls ``textNode.getFont()``. """
         return self.textNode.getFont()
         
     def textChanged(self):
@@ -721,6 +727,15 @@ class TextOverlay(OverlayContainer):
         return self.textSize == TextOverlay.AUTO_SIZE
         
     def setPos(self, x, y):
+        """ 
+        Sets the position of the text.
+        
+        .. note::
+            The actual node position is different from the x, y values
+            used with ``setPos`` and ``getPos``. Based on the height, y-offset
+            and x-alignment, the text is positioned so that ``setPos(0, 0)``
+            will place it nicely in the upper left corner.
+        """
         xoff = round(self.getAlignOffset())
         yoff = 0
         if self.trimHeight:
@@ -731,6 +746,8 @@ class TextOverlay(OverlayContainer):
         self.y = y
     
     def getAlignOffset(self):
+        """ Returns the amount to offset the text's x-position due to 
+        its alignment. """
         if self.textNode.hasAlign():
             a = self.textNode.getAlign()
             if a == TextNode.ACenter:

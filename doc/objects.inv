@@ -6,6 +6,7 @@ overlays.TextOverlay.defaultFont attribute Classes.html
 overlays.TextOverlay.setWordwrap method Classes.html
 overlays.OverlayContainer.setZIndex method Classes.html
 overlays.TextOverlay.destroy method Classes.html
+overlays.GeomMaker.startGeom method Classes.html
 overlays.OverlayContainer.destroy method Classes.html
 overlays.TextOverlay.AUTO_SIZE attribute Classes.html
 overlays.PixelNode.aspectRatioChanged method Classes.html
@@ -17,8 +18,7 @@ overlays.OverlayContainer.getZIndex method Classes.html
 overlays.OverlayContainer class Classes.html
 overlays.TextOverlay.setFontSize staticmethod Classes.html
 overlays.TextOverlay.loadFont staticmethod Classes.html
-overlays.GeomMaker.startGeom method Classes.html
-overlays.TextOverlay.setBorder method Classes.html
+overlays.TextOverlay.updateTexOffset method Classes.html
 overlays.OverlayContainer.getScale method Classes.html
 overlays.GeomMaker class Classes.html
 overlays.Overlay class Classes.html
@@ -33,11 +33,12 @@ overlays.Overlay.setSize method Classes.html
 overlays.Overlay.setTexcoords method Classes.html
 overlays.TextOverlay.getTextSize method Classes.html
 overlays.TextOverlay.getWordwrap method Classes.html
-overlays.GeomMaker.next method Classes.html
+overlays.TextOverlay.setText method Classes.html
 overlays.TextOverlay.lineHeightExtra method Classes.html
 overlays.TextOverlay.setTextSize method Classes.html
 overlays.OverlaySlice3 class Classes.html
 overlays.Overlay.setTexture method Classes.html
 overlays.TextOverlay class Classes.html
+overlays.GeomMaker.next method Classes.html
 overlays.Overlay.getSize method Classes.html
 overlays.PixelNode class Classes.html
