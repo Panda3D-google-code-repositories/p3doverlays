@@ -46,17 +46,9 @@ Classes
     :members:
     :show-inheritance:
 
-``GeomGen`` and ``GeomEdit``
+``GeomMaker``
 --------------------------------------
 
-The ``overlays`` module includes two classes to be used 
-as an alternative to CardMaker, as to allow for multiple quads 
-within a single node as well as vertex rewriting (for fast resizing).
-
-.. autoclass:: GeomGen
-    :members:
-    :show-inheritance:
-
-.. autoclass:: GeomEdit
+.. autoclass:: GeomMaker
     :members:
     :show-inheritance:

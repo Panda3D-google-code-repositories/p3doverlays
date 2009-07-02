@@ -1,15 +1,27 @@
 from pandac.PandaModules import *
 
 class GeomMaker(object):
-    
+    """
+    A utility to create complex and editable 'card' geometry. Multiple 'cards' 
+    can be written to a single geometry node, texcoords and vertices can be 
+    re-written, and line borders can be created and edited. This class is used
+    to create and resize overlay geometry.    
+    """
     DEFAULT = 'default'
     LINES = 'lines'
     TEXTURE = 'texture'
     
     def startGeom(self, mode=DEFAULT, texture=None, 
                   writer=None, hasColor=False):
-        """ If writer is not specified, assume we are generating, otherwise assume
-        we are editing. """
+        """ 
+        Prepares the geom maker. The mode can be one of DEFAULT (for generating or
+        editing cards), TEXTURE (for editing texcoords) or LINES (for generating or
+        editing lines). Specify a ``writer`` to edit its geometry, otherwise a new 
+        geometry will be created. 
+        
+        If ``hasColor`` is ``False``, the geometry will be written without any colour
+        data.
+        """
         self.mode = mode
         self.texture = texture
         self.writer = writer
@@ -26,22 +38,17 @@ class GeomMaker(object):
         
     def next(self, x, y, xs, ys, uvdata=None, color=None):
         """
-        Adds a sub-card (a quad) to the current geometry.
-        The positions are based on Panda3D's render2d coordinate system: (-1, -1) is bottom 
-        left and (1, 1) is top right.
-         
-        Use the converter methods to pass standard 'screen' position and size -- however,
-        it is recommended that the card's upper left corner remains at (0, 0) in 
-        world space in order to take full advantage of Node.setPos().
-        
-        Once all sub-cards have been added, generate the Node via _endGeometry.
-        
-        When generating, ``vertex`` is generally not used (unless a different vertex 
-        writer is desired).
+        Adds a sub-card (a quad) to the current geometry. The positions are
+        screen coordinates; however, it's highly recommended that the initial (X, Y)
+        positions (i.e. that of the top left card in the geometry) should be at (0, 0).
+        That way, node.setPos can be used for easy and efficient repositioning of the
+        geometry.
+
+        Once all sub-cards have been created, use :func:``endGeom`` to create the node.
         
         .. note::
-            When drawing lines, ``(x, y)`` are the start points and ``(xs, ys)`` 
-            are the end points.
+            When in LINES mode, ``(x, y)`` is the start point and ``(xs, ys)``
+            is the end point.
         """
         
         generating = self.writer is None
@@ -316,6 +323,9 @@ class Overlay(OverlayContainer):
         self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
     
     def setTexture(self, texture):
+        """
+        Sets the texture of this overlay.
+        """
         self.texture = texture
         self.node.setTexture(texture)
     

@@ -199,6 +199,11 @@ classes which inherit from it.</p>
 <dd>Adjusts the texcoords (in pixels) for this geometry by 
 modifying the vertex data.</dd></dl>
 
+<dl class="method">
+<dt id="overlays.Overlay.setTexture">
+<tt class="descname">setTexture</tt><big>(</big><em>texture</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setTexture" title="Permalink to this definition">¶</a></dt>
+<dd>Sets the texture of this overlay.</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -384,11 +389,51 @@ for static fonts).</p>
 </dd></dl>
 
 </div>
-<div class="section" id="geomgen-and-geomedit">
-<h2><tt class="docutils literal"><span class="pre">GeomGen</span></tt> and <tt class="docutils literal"><span class="pre">GeomEdit</span></tt><a class="headerlink" href="#geomgen-and-geomedit" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">overlays</span></tt> module includes two classes to be used
-as an alternative to CardMaker, as to allow for multiple quads
-within a single node as well as vertex rewriting (for fast resizing).</p>
+<div class="section" id="geommaker">
+<h2><tt class="docutils literal"><span class="pre">GeomMaker</span></tt><a class="headerlink" href="#geommaker" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="overlays.GeomMaker">
+<em class="property">
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomMaker</tt><a class="headerlink" href="#overlays.GeomMaker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>A utility to create complex and editable &#8216;card&#8217; geometry. Multiple &#8216;cards&#8217; 
+can be written to a single geometry node, texcoords and vertices can be 
+re-written, and line borders can be created and edited. This class is used
+to create and resize overlay geometry.</p>
+<dl class="method">
+<dt id="overlays.GeomMaker.endGeom">
+<tt class="descname">endGeom</tt><big>(</big><em>nodeName</em><big>)</big><a class="headerlink" href="#overlays.GeomMaker.endGeom" title="Permalink to this definition">¶</a></dt>
+<dd>Finishes creating the geometry and returns a node.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.GeomMaker.next">
+<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomMaker.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a sub-card (a quad) to the current geometry. The positions are
+screen coordinates; however, it&#8217;s highly recommended that the initial (X, Y)
+positions (i.e. that of the top left card in the geometry) should be at (0, 0).
+That way, node.setPos can be used for easy and efficient repositioning of the
+geometry.</p>
+<p>Once all sub-cards have been created, use :func:<tt class="docutils literal"><span class="pre">endGeom</span></tt> to create the node.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When in LINES mode, <tt class="docutils literal"><span class="pre">(x,</span> <span class="pre">y)</span></tt> is the start point and <tt class="docutils literal"><span class="pre">(xs,</span> <span class="pre">ys)</span></tt>
+is the end point.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="overlays.GeomMaker.startGeom">
+<tt class="descname">startGeom</tt><big>(</big><em>mode='default'</em>, <em>texture=None</em>, <em>writer=None</em>, <em>hasColor=False</em><big>)</big><a class="headerlink" href="#overlays.GeomMaker.startGeom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares the geom maker. The mode can be one of DEFAULT (for generating or
+editing cards), TEXTURE (for editing texcoords) or LINES (for generating or
+editing lines). Specify a <tt class="docutils literal"><span class="pre">writer</span></tt> to edit its geometry, otherwise a new 
+geometry will be created.</p>
+<p>If <tt class="docutils literal"><span class="pre">hasColor</span></tt> is <tt class="xref docutils literal"><span class="pre">False</span></tt>, the geometry will be written without any colour
+data.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -407,7 +452,7 @@ within a single node as well as vertex rewriting (for fast resizing).</p>
 <li><a class="reference external" href="#overlayslice3"><tt class="docutils literal"><span class="pre">OverlaySlice3</span></tt></a></li>
 <li><a class="reference external" href="#overlayslice9"><tt class="docutils literal"><span class="pre">OverlaySlice9</span></tt></a></li>
 <li><a class="reference external" href="#textoverlay"><tt class="docutils literal"><span class="pre">TextOverlay</span></tt></a></li>
-<li><a class="reference external" href="#geomgen-and-geomedit"><tt class="docutils literal"><span class="pre">GeomGen</span></tt> and <tt class="docutils literal"><span class="pre">GeomEdit</span></tt></a></li>
+<li><a class="reference external" href="#geommaker"><tt class="docutils literal"><span class="pre">GeomMaker</span></tt></a></li>
 </ul>
 </li>
 </ul>
