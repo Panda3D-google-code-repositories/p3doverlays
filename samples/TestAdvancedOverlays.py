@@ -40,16 +40,17 @@ class TestAdvancedOverlays:
         #We'll order it behind the text
         tex = loader.loadTexture('res/simple_ui.png')
         tex.setMagfilter(Texture.FTNearest)
-        self.panelBg = hud.OverlaySlice9(texture=tex, 
+        self.panelBg = hud.OverlaySlice9(texture=tex,
                                          texcoords=(0, 0, 54, 53),
                                          edges=(9, 9, 11, 10))
+        self.panelBg.setTexture(tex)
+        self.panelBg.setTexcoords(0, 0, 54, 53)
         self.panelBg.node.setColor(self.upColor)
         self.panelBg.reparentTo(panel)
         self.panelBg.setPos(-self.insets[1], -self.insets[0])
         
-        #Convenience method to load a crisp font at size 12 pt
-        self.font = hud.TextOverlay.loadFont('res/DejaVuSans.ttf', size=12)
-        self.mono = hud.TextOverlay.loadFont('res/DejaVuSansMono.ttf', size=12)
+        #Convenience method to load a crisp font at size 11 pt
+        self.font = hud.TextOverlay.loadFont('res/DejaVuSans.ttf', size=11)
         hud.TextOverlay.defaultFont = self.font
         
         #Write some instructions
@@ -69,8 +70,9 @@ class TestAdvancedOverlays:
         self.panelTxt = hud.TextOverlay(msg=msg, color=textColor,
                                         wordwrap=self.wordwrap1)
         self.panelTxt.reparentTo(panel)
+        self.panelTxt.textNode.setAlign(TextNode.ACenter)
         self.panelTxt.setPos(self.padding, self.padding)
-                
+        
         self.setRollover(False)
         
         #resize the bg panel to the text

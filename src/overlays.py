@@ -1,52 +1,30 @@
 from pandac.PandaModules import *
 
-class GeomEdit:
-    """ A base class used only for editing geometry made with GeomGen. """
+class GeomMaker(object):
     
-    def startGeom(self, hasColor=False, texture=None, lines=False):
-        self.lines = lines
-        self.texture = texture
-    def endGeom(self, nodeName):
-        return None
-    def next(self, x, y, xs, ys, uvdata=None, vertex=None, color=None):
-        """
-        Rewrites the quad data to the given vertex writer. ``uvdata`` and 
-        ``color`` is ignored when editing.
-        """
-        z = 0
-        if not self.lines:
-            vertex.addData3f(Vec3(x, z, y))
-            vertex.addData3f(Vec3(x+xs, z, y))
-            vertex.addData3f(Vec3(x+xs, z, y+ys))
-            vertex.addData3f(Vec3(x, z, y+ys))
-        else:
-            vertex.addData3f(Vec3(x, z, y))
-            vertex.addData3f(Vec3(xs, z, ys))
-        
-class GeomGen(GeomEdit):
-    """ Used for initially generating geometry. """
+    DEFAULT = 'default'
+    LINES = 'lines'
+    TEXTURE = 'texture'
     
-    def startGeom(self, hasColor=False, texture=None, lines=False):
-        """
-        Called to start creating card geometry. 
-        Vertex colours will not be stored if hasColor is left False; this 
-        will result in a single-colour geometry. To colour sub-cards differently, 
-        use has hasColor=True.
-        
-        Set ``lines`` to ``True`` to draw lines instead of triangles.
-        """
-        self.lines = lines
+    def startGeom(self, mode=DEFAULT, texture=None, 
+                  writer=None, hasColor=False):
+        """ If writer is not specified, assume we are generating, otherwise assume
+        we are editing. """
+        self.mode = mode
         self.texture = texture
+        self.writer = writer
         self.hasColor = hasColor
-        format = GeomVertexFormat.getV3c4t2() if hasColor else GeomVertexFormat.getV3t2()
-        self.vdata = GeomVertexData('quad', format, Geom.UHStatic)
-        self.vertex = GeomVertexWriter(self.vdata, 'vertex')
-        self.pigment = None if not hasColor else GeomVertexWriter(self.vdata, 'color')
-        self.uv = GeomVertexWriter(self.vdata, 'texcoord') if not lines else None
-        self.prim = GeomTriangles(Geom.UHStatic) if not lines else GeomLines(Geom.UHStatic)
         self.n = 0
-    
-    def next(self, x, y, xs, ys, uvdata=None, vertex=None, color=None):
+        if self.writer is None:
+            lines = mode == GeomMaker.LINES
+            format = GeomVertexFormat.getV3c4t2() if hasColor else GeomVertexFormat.getV3t2()
+            self.vdata = GeomVertexData('quad', format, Geom.UHStatic)
+            self.vertex = GeomVertexWriter(self.vdata, 'vertex')
+            self.pigment = None if not hasColor else GeomVertexWriter(self.vdata, 'color')
+            self.uv = GeomVertexWriter(self.vdata, 'texcoord') if not lines else None
+            self.prim = GeomTriangles(Geom.UHStatic) if not lines else GeomLines(Geom.UHStatic)
+        
+    def next(self, x, y, xs, ys, uvdata=None, color=None):
         """
         Adds a sub-card (a quad) to the current geometry.
         The positions are based on Panda3D's render2d coordinate system: (-1, -1) is bottom 
@@ -66,23 +44,36 @@ class GeomGen(GeomEdit):
             are the end points.
         """
         
-        #write vertex data using parent class
-        if vertex is None:
-            vertex = self.vertex
+        generating = self.writer is None
         
-        GeomEdit.next(self, x, y, xs, ys, uvdata, vertex, color)
+        #don't do any of this if we're working with texcoords only
+        if self.mode != GeomMaker.TEXTURE:
+            z = 0
+            #first draw the vertex positions
+            vertex = self.writer or self.vertex
+            if self.mode == GeomMaker.LINES:
+                vertex.addData3f(Vec3(x, z, y))
+                vertex.addData3f(Vec3(xs, z, ys))
+            else:
+                vertex.addData3f(Vec3(x, z, y))
+                vertex.addData3f(Vec3(x+xs, z, y))
+                vertex.addData3f(Vec3(x+xs, z, y+ys))
+                vertex.addData3f(Vec3(x, z, y+ys))
+            #if we are generating for the first time,
+            #draw the colour if needed
+            if generating:
+                if self.hasColor and color is None:
+                    color = Vec4(1,1,1,1)
+                if self.hasColor:
+                    self.pigment.addData4f(color)
+                    self.pigment.addData4f(color)
+                    if self.mode != GeomMaker.LINES:
+                        self.pigment.addData4f(color)
+                        self.pigment.addData4f(color)
         
-        #write the rest of the data
-        if self.hasColor and color is None:
-            color = Vec4(1,1,1,1)
-        if self.hasColor:
-            self.pigment.addData4f(color)
-            self.pigment.addData4f(color)
-            if not self.lines:
-                self.pigment.addData4f(color)
-                self.pigment.addData4f(color)
-       
-        if not self.lines:
+        #if we are generating/editing texcoords...
+        if (generating and self.uv is not None) or self.mode == GeomMaker.TEXTURE:
+            uvw = self.writer or self.uv
             u, v, us, vs = 0, -0, 1, -1
             if uvdata is not None and self.texture is not None:
                 #1,1  0,1  0,0  1,0
@@ -90,41 +81,54 @@ class GeomGen(GeomEdit):
                 ty = float(self.texture.getYSize())
                 u, v, us, vs = uvdata
                 u, v, us, vs = (u)/tx, 1-(v)/ty, (us+1)/tx, 1-(vs+1)/ty
-            self.uv.addData2f(u,v)
-            self.uv.addData2f(us,v)
-            self.uv.addData2f(us,vs)
-            self.uv.addData2f(u,vs)
-            
-            self.prim.addVertices(self.n, self.n+1, self.n+2)
-            self.prim.addVertices(self.n+2, self.n+3, self.n)
-            self.prim.closePrimitive()
-            self.n += 4
-        else:
-            self.prim.addVertices(self.n, self.n+1)
-            self.prim.closePrimitive()
-            self.n += 2
+            uvw.addData2f(u,v)
+            uvw.addData2f(us,v)
+            uvw.addData2f(us,vs)
+            uvw.addData2f(u,vs)
         
+        if generating:
+            if self.mode == GeomMaker.LINES:
+                self.prim.addVertices(self.n, self.n+1)
+                self.prim.closePrimitive()
+                self.n += 2
+            else:
+                self.prim.addVertices(self.n, self.n+1, self.n+2)
+                self.prim.addVertices(self.n+2, self.n+3, self.n)
+                self.prim.closePrimitive()
+                self.n += 4
+            
     def endGeom(self, nodeName):
         """
         Finishes creating the geometry and returns a node.
         """
-        geom = Geom(self.vdata)
-        geom.addPrimitive(self.prim)
-        
-        node = GeomNode("gui_geom")
-        node.addGeom(geom)
-        
-        nodepath = NodePath(nodeName)
-        nodepath.attachNewNode(node)
-        if self.texture is not None:
-            nodepath.setTexture(self.texture)
-        nodepath.setTransparency(True)
-        nodepath.setDepthWrite(False)
-        nodepath.setDepthTest(False)
-        nodepath.setTwoSided(True)
-        nodepath.setAttrib(LightAttrib.makeAllOff())
-        nodepath.setBin('fixed', 0)
-        return nodepath
+        if self.writer is not None:
+            #if we were just editing...
+            return None
+        else:
+            geom = Geom(self.vdata)
+            geom.addPrimitive(self.prim)
+            
+            node = GeomNode("gui_geom")
+            node.addGeom(geom)
+            
+            nodepath = NodePath(nodeName)
+            nodepath.attachNewNode(node)
+            if self.texture is not None:
+                nodepath.setTexture(self.texture)
+            nodepath.setTransparency(True)
+            nodepath.setDepthWrite(False)
+            nodepath.setDepthTest(False)
+            nodepath.setTwoSided(True)
+            nodepath.setAttrib(LightAttrib.makeAllOff())
+            nodepath.setBin('fixed', 0)
+            
+            #clear some vars
+            self.uv = None
+            self.vertex = None
+            self.pigment = None
+            self.vdata = None
+            
+            return nodepath
 
 class OverlayContainer(object):
     """ 
@@ -155,7 +159,7 @@ class OverlayContainer(object):
         if self.node is not None:
             self.node.setScale(self.xScale, 1, self.yScale*self.yMult)
             self.node.setBin('fixed', self.zIndex)
-            
+    
     def setZIndex(self, zIndex):
         """ Sets the z-Index (depth) of this overlay. Higher numbers brings an
         item closer to the front.
@@ -268,8 +272,7 @@ class Overlay(OverlayContainer):
     see the tutorials for further details.
     """
         
-    geomGen = GeomGen()
-    geomEdit = GeomEdit()
+    geomMaker = GeomMaker()
         
     def __init__(self, name=None, size=(0, 0), texture=None, 
                  texcoords=None, color=None):
@@ -277,16 +280,19 @@ class Overlay(OverlayContainer):
         self.border = None
         self.borderPadding = 0
         self.texture = texture
+        self.texcoords = texcoords
         self.width, self.height = size  
-        self.node = self._draw(Overlay.geomGen, self.width, self.height, texcoords)
+        self.node = self.draw(self.width, self.height, texcoords)
         self.geom = self.node.getChildren()[0]
         if color is not None:
             self.node.setColor(color)
     
-    def _draw(self, geom, width, height, texcoords=None, vertex=None):
-        geom.startGeom(hasColor=False, texture=self.texture)
-        geom.next(0, 0, width, height, texcoords, vertex)
-        return geom.endGeom(self.name)
+    def draw(self, width, height, texcoords=None, 
+              mode=GeomMaker.DEFAULT, writer=None):
+        Overlay.geomMaker.startGeom(mode=mode, hasColor=False, 
+                                    texture=self.texture, writer=writer)
+        Overlay.geomMaker.next(0, 0, width, height, texcoords)
+        return Overlay.geomMaker.endGeom(self.name)
     
     def setBorder(self, border, padding=0):
         """ Helper method to quickly set a 'border' overlay which is 
@@ -309,18 +315,41 @@ class Overlay(OverlayContainer):
         w, h = self.getSize()
         self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
     
+    def setTexture(self, texture):
+        self.texture = texture
+        self.node.setTexture(texture)
+    
+    def getTexture(self):
+        return self.texture
+    
+    def setTexcoords(self, x1, y1, x2, y2):
+        """ Adjusts the texcoords (in pixels) for this geometry by 
+        modifying the vertex data. """
+        self.texcoords = x1, y1, x2, y2
+        vdata = self.geom.node().modifyGeom(0).modifyVertexData()
+        writer = GeomVertexWriter(vdata, 'texcoord')
+        writer.setRow(0)
+        self.draw(self.width, self.height, mode=GeomMaker.TEXTURE, 
+                  texcoords=self.texcoords, writer=writer)
+    
+    def getTexcoords(self):
+        return self.texcoords
+    
     def setSize(self, width, height):
         """ Sets the size of this overlay in pixels. """ 
         if self.width != width or self.height != height:
             vdata = self.geom.node().modifyGeom(0).modifyVertexData()
-            vertex = GeomVertexWriter(vdata, 'vertex')
-            vertex.setRow(0)
-            vertex.setColumn(0)
+            writer = GeomVertexWriter(vdata, 'vertex')
+            writer.setRow(0)
             self.width = width
             self.height = height
-            self._draw(Overlay.geomEdit, width, height, vertex=vertex)
+            self.draw(width, height, writer=writer)
         if self.border is not None:
             self.updateBorder()
+        
+    def getSize(self):
+        """ Returns the size of this overlay in pixels, as a tuple of width, height. """
+        return self.width, self.height
     
     def setPos(self, x, y):
         OverlayContainer.setPos(self, x, y)
@@ -332,10 +361,6 @@ class Overlay(OverlayContainer):
         if self.border is not None:
             self.updateBorder()
     
-    def getSize(self):
-        """ Returns the size of this overlay in pixels, as a tuple of width, height. """
-        return self.width, self.height
-
 class OverlaySlice3(Overlay):
     """
     Creates a sliced overlay with the given options, for scaling
@@ -361,7 +386,8 @@ class OverlaySlice3(Overlay):
         self.color2 = color2
         Overlay.__init__(self, name, size, texture, texcoords)
     
-    def _draw(self, geom, width, height, texcoords=None, vertex=None):
+    def draw(self, width, height, texcoords=None, 
+              mode=GeomMaker.DEFAULT, writer=None):
         uv1, uv2, uv3 = None, None, None
         hasTex = texcoords is not None and self.texture is not None
         if hasTex:
@@ -379,19 +405,21 @@ class OverlaySlice3(Overlay):
         colr1 = None if hasTex else self.color1
         colr2 = None if hasTex else self.color2 
         
-        geom.startGeom(hasColor=not hasTex, texture=self.texture)
+        geom = Overlay.geomMaker
+        geom.startGeom(mode=mode, hasColor=not hasTex, 
+                       texture=self.texture, writer=writer)
         if self.horizontal:
-            geom.next(0, 0, self.edges, height, uv1, vertex, colr1)
+            geom.next(0, 0, self.edges, height, uv1, colr1)
             geom.next(self.edges, 0, width-self.edges*2, height, 
-                      uv2, vertex, colr2)
+                      uv2, colr2)
             geom.next(width-self.edges, 0, self.edges, height, 
-                      uv3, vertex, colr1)
+                      uv3, colr1)
         else:
-            geom.next(0, 0, width, self.edges, uv1, edges, colr1)
+            geom.next(0, 0, width, self.edges, uv1, colr1)
             geom.next(0, self.edges, width, height-self.edges*2, 
-                      uv2, vertex, colr2)
+                      uv2, colr2)
             geom.next(0, height-self.edges, width, self.edges, 
-                      uv3, vertex, colr1)
+                      uv3, colr1)
         return geom.endGeom(self.name)
     
 class OverlaySlice9(Overlay):
@@ -421,11 +449,11 @@ class OverlaySlice9(Overlay):
         self.color2 = color2
         if not isinstance(edges, tuple):
             edges = edges, edges, edges, edges
-        self.edges = edges
-        self.top, self.left, self.bottom, self.right = self.edges
+        self.top, self.left, self.bottom, self.right = edges
         Overlay.__init__(self, name, size, texture, texcoords)
     
-    def _draw(self, geom, width, height, texcoords=None, vertex=None):
+    def draw(self, width, height, texcoords=None, 
+              mode=GeomMaker.DEFAULT, writer=None):
         uvtl, uvtop, uvtr = None, None, None
         uvleft, uvcenter, uvright = None, None, None
         uvbl, uvbottom, uvbr = None, None, None
@@ -451,27 +479,29 @@ class OverlaySlice9(Overlay):
         
         w, h = width, height
         
-        geom.startGeom(hasColor=not hasTex, texture=self.texture)
+        geom = Overlay.geomMaker
+        geom.startGeom(mode=mode, hasColor=not hasTex, 
+                       texture=self.texture, writer=writer)
         #top
         geom.next(self.left, 0, w-self.left-self.right, self.top, uvtop, 
-                  vertex, colr2)
-        geom.next(0, 0, self.left, self.top, uvtl, vertex, colr1)
+                  colr2)
+        geom.next(0, 0, self.left, self.top, uvtl, colr1)
         geom.next(w-self.right, 0, self.right, self.top, uvtr,
-                  vertex, colr1)
+                   colr1)
         #mid
         midh = h-self.bottom-self.top
-        geom.next(0, self.top, self.left, midh, uvleft, vertex, colr2)
+        geom.next(0, self.top, self.left, midh, uvleft, colr2)
         geom.next(self.left, self.top, w-self.left-self.right, midh, uvcenter, 
-                  vertex, colr1)
+                  colr1)
         geom.next(w-self.right, self.top, self.right, midh, uvright, 
-                  vertex, colr2)
+                  colr2)
         #bottom
         by = h-self.bottom
-        geom.next(0, by, self.left, self.bottom, uvbl, vertex, colr1)
+        geom.next(0, by, self.left, self.bottom, uvbl, colr1)
         geom.next(self.left, by, w-self.left-self.right, self.bottom, 
-                  uvbottom, vertex, colr2)
+                  uvbottom, colr2)
         geom.next(w-self.right, by, self.right, self.bottom, uvbr, 
-                  vertex, colr1)
+                  colr1)
         return geom.endGeom(self.name)
 
 class LineBorder(Overlay):
@@ -482,13 +512,14 @@ class LineBorder(Overlay):
     def __init__(self, name=None, size=(0, 0), color=Vec4(0, 0, 0, 1)):
         Overlay.__init__(self, name, size, color=color)
         
-    def _draw(self, geom, w, h, texcoords=None, vertex=None):
-        geom.startGeom(hasColor=False, lines=True)
+    def draw(self, w, h, texcoords=None, mode=GeomMaker.LINES, writer=None):
+        geom = Overlay.geomMaker
+        geom.startGeom(mode=mode, hasColor=False, writer=writer)
         w -= 1
-        geom.next(0, 1, w+1, 1, vertex=vertex)
-        geom.next(w, 1, w, h, vertex=vertex)
-        geom.next(w, h, 0, h, vertex=vertex)
-        geom.next(0, 0, 0, h, vertex=vertex)            
+        geom.next(0, 1, w+1, 1)
+        geom.next(w, 1, w, h)
+        geom.next(w, h, 0, h)
+        geom.next(0, 0, 0, h)            
         return geom.endGeom(self.name)
 
 class TextOverlay(OverlayContainer):
@@ -572,8 +603,7 @@ class TextOverlay(OverlayContainer):
     
     def __init__(self, name=None, msg=None, textSize=AUTO_SIZE,
                  textNode=None, font=None, color=Vec4(0, 0, 0, 1), 
-                 align=TextNode.ALeft, wordwrap=None, trimHeight=True, 
-                 xOff=0, yOff=0):
+                 align=TextNode.ALeft, wordwrap=None, trimHeight=True):
         OverlayContainer.__init__(self, name, noNode=True, flip=True)
                 
         tnn = '%s_text' % self.name
@@ -581,6 +611,7 @@ class TextOverlay(OverlayContainer):
         self.textNode.setName(tnn)
         
         self.trimHeight = trimHeight
+        self.wordwrap = None
         
         font = TextOverlay.defaultFont if font is None else font
         if font is not None:
@@ -600,6 +631,11 @@ class TextOverlay(OverlayContainer):
         if wordwrap is not None:
             self.setWordwrap(wordwrap)
     
+    
+    def setBorder(self, border, borderPadding=0):
+        """ Not yet supported with TextOverlay. """
+        print "setBorder isn't yet supported with TextOverlay"
+        
     def updateTexOffset(self):
         f = self.textNode.getFont()
         if isinstance(f, DynamicTextFont):
@@ -617,23 +653,28 @@ class TextOverlay(OverlayContainer):
     
     def setFont(self, font):
         self.textNode.setFont(font)
+        scale = float(self.getTextSize())
+        self.setScale(scale, scale)
         self.textChanged()
         self.updateTexOffset()
     
     def getFont(self):
         return self.textNode.getFont()
-    
+        
     def textChanged(self):
         """ The text has changed -- reposition it for the parent overlay. """
         x, y = self.getPos()
         self.setPos(x, y)
-    
+        
     def setWordwrap(self, wordwrap):
         """ Sets the wordwrap, in pixels. """
         self.wordwrap = wordwrap
-        self.textNode.setWordwrap(wordwrap / float(self.xScale))
+        if wordwrap is None:
+            self.textNode.clearWordwrap()
+        else: 
+            self.textNode.setWordwrap(wordwrap / float(self.xScale))
         self.textChanged()
-        
+            
     def getWordwrap(self):
         """ Returns the wordwrap, in pixels. """
         return self.wordwrap
@@ -664,18 +705,30 @@ class TextOverlay(OverlayContainer):
                 return 30
         else:
             return self.textSize
-    
+        
     def isAutoSize(self):
         """ Returns ``True`` if :data:`AUTO_SIZE` is on. """
         return self.textSize == TextOverlay.AUTO_SIZE
         
     def setPos(self, x, y):
+        xoff = round(self.getAlignOffset())
         yoff = 0
         if self.trimHeight:
             yoff = self.lineHeightExtra()
-        off = round(self.textNode.getTop() * self.yScale - yoff)
-        OverlayContainer.setPos(self, x, y+off)
+        yoff = round(self.textNode.getTop() * self.yScale - yoff)
+        OverlayContainer.setPos(self, x+xoff, y+yoff)
+        self.x = x
         self.y = y
+    
+    def getAlignOffset(self):
+        if self.textNode.hasAlign():
+            a = self.textNode.getAlign()
+            if a == TextNode.ACenter:
+                return self.getSize()[0] / 2.0
+            elif a == TextNode.ARight:
+                return self.getSize()[0]
+            else:
+                return 0
     
     def lineHeightExtra(self):
         """ Returns the line height minus 1.0 (standard Panda text height) in pixels. """
@@ -686,6 +739,10 @@ class TextOverlay(OverlayContainer):
         """ Destroys this overlay. """
         self.textNode = None
         OverlayContainer.destroy(self)
+    
+    def setSize(self, width, height):
+        """ Deprecated; does nothing. """
+        pass
     
     def getSize(self):
         """ Returns the size of the text node, in pixels. If

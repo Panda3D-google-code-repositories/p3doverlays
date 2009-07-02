@@ -81,7 +81,7 @@ is generally used like so:</p>
 <dl class="class">
 <dt id="overlays.OverlayContainer">
 <em class="property">
-class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlayContainer</tt><big>(</big><em>name=None</em>, <em>noNode=False</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">OverlayContainer</tt><big>(</big><em>name=None</em>, <em>noNode=False</em>, <em>flip=False</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
 <p>The base class for all overlays, but can also act as a container
 for other overlays (i.e. a panel).</p>
@@ -122,12 +122,6 @@ in pixels.</dd></dl>
 <dd>Moves this overlay under the given parent node or overlay.</dd></dl>
 
 <dl class="method">
-<dt id="overlays.OverlayContainer.setBorder">
-<tt class="descname">setBorder</tt><big>(</big><em>border</em>, <em>padding=0</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setBorder" title="Permalink to this definition">¶</a></dt>
-<dd>Helper method to quickly set a &#8216;border&#8217; overlay which is 
-resized, rescaled and repositioned whenever this overlay is changed.</dd></dl>
-
-<dl class="method">
 <dt id="overlays.OverlayContainer.setPos">
 <tt class="descname">setPos</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setPos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the position of this overlay in pixels, where (0, 0) 
@@ -143,8 +137,8 @@ allows us to set its position in screen-space coordinates.</p>
 <dl class="method">
 <dt id="overlays.OverlayContainer.setScale">
 <tt class="descname">setScale</tt><big>(</big><em>xScale</em>, <em>yScale</em><big>)</big><a class="headerlink" href="#overlays.OverlayContainer.setScale" title="Permalink to this definition">¶</a></dt>
-<dd>Applies the given scale to the overlay, where (1, 1) is a 100% x 
-and y scale (normal).</dd></dl>
+<dd>Applies the given scale to the overlay, where (1, 1) is 100% x 
+and y scale (default).</dd></dl>
 
 <dl class="method">
 <dt id="overlays.OverlayContainer.setZIndex">
@@ -184,9 +178,26 @@ see the tutorials for further details.</p>
 <dd>Returns the size of this overlay in pixels, as a tuple of width, height.</dd></dl>
 
 <dl class="method">
+<dt id="overlays.Overlay.setBorder">
+<tt class="descname">setBorder</tt><big>(</big><em>border</em>, <em>padding=0</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setBorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to quickly set a &#8216;border&#8217; overlay which is 
+resized, rescaled and repositioned whenever this overlay is changed.</p>
+<p>The <tt class="docutils literal"><span class="pre">padding</span></tt> can be specified to add spacing between. You can also
+use a negative padding.</p>
+<p>Borders are generally not supported by <tt class="docutils literal"><span class="pre">OverlayContainers</span></tt>, but by
+classes which inherit from it.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="overlays.Overlay.setSize">
 <tt class="descname">setSize</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setSize" title="Permalink to this definition">¶</a></dt>
 <dd>Sets the size of this overlay in pixels.</dd></dl>
+
+<dl class="method">
+<dt id="overlays.Overlay.setTexcoords">
+<tt class="descname">setTexcoords</tt><big>(</big><em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em><big>)</big><a class="headerlink" href="#overlays.Overlay.setTexcoords" title="Permalink to this definition">¶</a></dt>
+<dd>Adjusts the texcoords (in pixels) for this geometry by 
+modifying the vertex data.</dd></dl>
 
 </dd></dl>
 
@@ -238,11 +249,10 @@ or a single number to use for all edges.</p>
 <dl class="class">
 <dt id="overlays.TextOverlay">
 <em class="property">
-class </em><tt class="descclassname">overlays.</tt><tt class="descname">TextOverlay</tt><big>(</big><em>name=None</em>, <em>msg=None</em>, <em>textSize='auto'</em>, <em>textGen=None</em>, <em>font=None</em>, <em>color=Vec4(0</em>, <em>0</em>, <em>0</em>, <em>1)</em>, <em>align=0</em>, <em>wordwrap=None</em>, <em>trimHeight=True</em>, <em>generate=True</em>, <em>xOff=0</em>, <em>yOff=0</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay" title="Permalink to this definition">¶</a></dt>
+class </em><tt class="descclassname">overlays.</tt><tt class="descname">TextOverlay</tt><big>(</big><em>name=None</em>, <em>msg=None</em>, <em>textSize='auto'</em>, <em>textNode=None</em>, <em>font=None</em>, <em>color=Vec4(0</em>, <em>0</em>, <em>0</em>, <em>1)</em>, <em>align=0</em>, <em>wordwrap=None</em>, <em>trimHeight=True</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a title="overlays.OverlayContainer" class="reference internal" href="#overlays.OverlayContainer"><tt class="xref docutils literal"><span class="pre">overlays.OverlayContainer</span></tt></a></p>
 <p>TextOverlay provides a simple manner of displaying crisp text as an overlay.
-Each text overlay contains: a TextNode for generation, a &#8216;top&#8217; node, and the
-actual text node (if it exists) parented to the &#8216;top node&#8217;.</p>
+Each text overlay contains <tt class="docutils literal"><span class="pre">node</span></tt>, a NodePath generated from the TextNode.</p>
 <p>Overlays use pixelsPerUnit and scaling to generate crisp text. For the best 
 results, you should set the overlay&#8217;s text size (i.e. text scale) to match 
 the pixelsPerUnit of your font. You can use <a title="overlays.TextOverlay.AUTO_SIZE" class="reference internal" href="#overlays.TextOverlay.AUTO_SIZE"><tt class="xref docutils literal"><span class="pre">AUTO_SIZE</span></tt></a> (the default
@@ -253,8 +263,6 @@ regardless of its pixels per unit.</p>
 <p>A font height of 1.0 is a Panda standard, and using different values 
 (such as using font.setPointSize, which adjusts the height internally) may
 create undesired results with TextOverlay.</p>
-<p>If <tt class="docutils literal"><span class="pre">msg</span></tt> is specified and <tt class="docutils literal"><span class="pre">generate</span></tt> is not <tt class="xref docutils literal"><span class="pre">False</span></tt>, a text node will be 
-generated after the properties are set.</p>
 <p>If no <tt class="docutils literal"><span class="pre">textGen</span></tt> is specified, one will be created. Likewise, if <tt class="docutils literal"><span class="pre">font</span></tt> is not 
 specified, the <tt class="docutils literal"><span class="pre">defaultFont</span></tt> will be used if it has been set, otherwise 
 <tt class="docutils literal"><span class="pre">textGen</span></tt>&#8216;s default font will be used. The <tt class="docutils literal"><span class="pre">color</span></tt> is the color for the text
@@ -284,25 +292,6 @@ the text size to 30 (which is the default from egg-mkfont).</dd></dl>
 <dt id="overlays.TextOverlay.destroy">
 <tt class="descname">destroy</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.destroy" title="Permalink to this definition">¶</a></dt>
 <dd>Destroys this overlay.</dd></dl>
-
-<dl class="method">
-<dt id="overlays.TextOverlay.destroyText">
-<tt class="descname">destroyText</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.destroyText" title="Permalink to this definition">¶</a></dt>
-<dd>Destroys the text node (not the textGen) if it exists.</dd></dl>
-
-<dl class="method">
-<dt id="overlays.TextOverlay.detachText">
-<tt class="descname">detachText</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.detachText" title="Permalink to this definition">¶</a></dt>
-<dd>Detaches the rendered text node without destroying it, returning
-the text node or None if one did not exist. This also sets this overlay&#8217;s
-text node to None.</dd></dl>
-
-<dl class="method">
-<dt id="overlays.TextOverlay.generate">
-<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.generate" title="Permalink to this definition">¶</a></dt>
-<dd>Destroys the last text node and generates a new node using 
-this overlay&#8217;s textGen. The new node will be resized to the
-current text size.</dd></dl>
 
 <dl class="method">
 <dt id="overlays.TextOverlay.getSize">
@@ -347,6 +336,11 @@ for convenience.</p>
 main description for details.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="overlays.TextOverlay.setBorder">
+<tt class="descname">setBorder</tt><big>(</big><em>border</em>, <em>borderPadding=0</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setBorder" title="Permalink to this definition">¶</a></dt>
+<dd>Not yet supported with TextOverlay.</dd></dl>
+
 <dl class="staticmethod">
 <dt id="overlays.TextOverlay.setFontSize">
 <em class="property">
@@ -363,10 +357,15 @@ that no associations to the old font pages stay around.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="overlays.TextOverlay.setSize">
+<tt class="descname">setSize</tt><big>(</big><em>width</em>, <em>height</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setSize" title="Permalink to this definition">¶</a></dt>
+<dd>Deprecated; does nothing.</dd></dl>
+
+<dl class="method">
 <dt id="overlays.TextOverlay.setTextSize">
 <tt class="descname">setTextSize</tt><big>(</big><em>size</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setTextSize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the scale of the text node and repositions it
-to fit in the upper left (0, 0) of the parent node.</p>
+<dd><p>Sets the scale of the text node and repositions it vertically to 
+fit the new size.</p>
 <p>If size is <a title="overlays.TextOverlay.AUTO_SIZE" class="reference internal" href="#overlays.TextOverlay.AUTO_SIZE"><tt class="xref docutils literal"><span class="pre">AUTO_SIZE</span></tt></a>, it will attempt to resize the text
 to the current font&#8217;s pixels per units (or default to size 30 
 for static fonts).</p>
@@ -378,9 +377,9 @@ for static fonts).</p>
 <dd>Sets the wordwrap, in pixels.</dd></dl>
 
 <dl class="method">
-<dt id="overlays.TextOverlay.setZIndex">
-<tt class="descname">setZIndex</tt><big>(</big><em>zIndex</em><big>)</big><a class="headerlink" href="#overlays.TextOverlay.setZIndex" title="Permalink to this definition">¶</a></dt>
-<dd>Sets the fixed bin order of the text node, as well as the container.</dd></dl>
+<dt id="overlays.TextOverlay.textChanged">
+<tt class="descname">textChanged</tt><big>(</big><big>)</big><a class="headerlink" href="#overlays.TextOverlay.textChanged" title="Permalink to this definition">¶</a></dt>
+<dd>The text has changed &#8211; reposition it for the parent overlay.</dd></dl>
 
 </dd></dl>
 
@@ -390,61 +389,6 @@ for static fonts).</p>
 <p>The <tt class="docutils literal"><span class="pre">overlays</span></tt> module includes two classes to be used
 as an alternative to CardMaker, as to allow for multiple quads
 within a single node as well as vertex rewriting (for fast resizing).</p>
-<dl class="class">
-<dt id="overlays.GeomGen">
-<em class="property">
-class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomGen</tt><a class="headerlink" href="#overlays.GeomGen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a title="overlays.GeomEdit" class="reference internal" href="#overlays.GeomEdit"><tt class="xref docutils literal"><span class="pre">overlays.GeomEdit</span></tt></a></p>
-<p>Used for initially generating geometry.</p>
-<dl class="method">
-<dt id="overlays.GeomGen.endGeom">
-<tt class="descname">endGeom</tt><big>(</big><em>nodeName</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.endGeom" title="Permalink to this definition">¶</a></dt>
-<dd>Finishes creating the geometry and returns a node.</dd></dl>
-
-<dl class="method">
-<dt id="overlays.GeomGen.next">
-<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>vertex=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.next" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a sub-card (a quad) to the current geometry.
-The positions are based on Panda3D&#8217;s render2d coordinate system: (-1, -1) is bottom 
-left and (1, 1) is top right.</p>
-<p>Use the converter methods to pass standard &#8216;screen&#8217; position and size &#8211; however,
-it is recommended that the card&#8217;s upper left corner remains at (0, 0) in 
-world space in order to take full advantage of Node.setPos().</p>
-<p>Once all sub-cards have been added, generate the Node via _endGeometry.</p>
-<p>When generating, <tt class="docutils literal"><span class="pre">vertex</span></tt> is generally not used (unless a different vertex 
-writer is desired).</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">When drawing lines, <tt class="docutils literal"><span class="pre">(x,</span> <span class="pre">y)</span></tt> are the start points and <tt class="docutils literal"><span class="pre">(xs,</span> <span class="pre">ys)</span></tt> 
-are the end points.</p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="overlays.GeomGen.startGeom">
-<tt class="descname">startGeom</tt><big>(</big><em>hasColor=False</em>, <em>texture=None</em>, <em>lines=False</em><big>)</big><a class="headerlink" href="#overlays.GeomGen.startGeom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called to start creating card geometry. 
-Vertex colours will not be stored if hasColor is left False; this 
-will result in a single-colour geometry. To colour sub-cards differently, 
-use has hasColor=True.</p>
-<p>Set <tt class="docutils literal"><span class="pre">lines</span></tt> to <tt class="xref docutils literal"><span class="pre">True</span></tt> to draw lines instead of triangles.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="overlays.GeomEdit">
-<em class="property">
-class </em><tt class="descclassname">overlays.</tt><tt class="descname">GeomEdit</tt><a class="headerlink" href="#overlays.GeomEdit" title="Permalink to this definition">¶</a></dt>
-<dd><p>A base class used only for editing geometry made with GeomGen.</p>
-<dl class="method">
-<dt id="overlays.GeomEdit.next">
-<tt class="descname">next</tt><big>(</big><em>x</em>, <em>y</em>, <em>xs</em>, <em>ys</em>, <em>uvdata=None</em>, <em>vertex=None</em>, <em>color=None</em><big>)</big><a class="headerlink" href="#overlays.GeomEdit.next" title="Permalink to this definition">¶</a></dt>
-<dd>Rewrites the quad data to the given vertex writer. <tt class="docutils literal"><span class="pre">uvdata</span></tt> and 
-<tt class="docutils literal"><span class="pre">color</span></tt> is ignored when editing.</dd></dl>
-
-</dd></dl>
-
 </div>
 </div>
 
