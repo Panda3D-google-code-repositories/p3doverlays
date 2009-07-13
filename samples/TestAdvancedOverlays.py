@@ -70,7 +70,7 @@ class TestAdvancedOverlays:
         self.panelTxt = hud.TextOverlay(msg=msg, color=textColor,
                                         wordwrap=self.wordwrap1)
         self.panelTxt.reparentTo(panel)
-        self.panelTxt.textNode.setAlign(TextNode.ACenter)
+        self.panelTxt.setAlign(TextNode.ACenter)
         self.panelTxt.setPos(self.padding, self.padding)
         
         self.setRollover(False)

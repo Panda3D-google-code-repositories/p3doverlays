@@ -255,13 +255,21 @@ class PixelNode(NodePath, OverlayContainer):
         self.setPos(-1,0,1) #the upper left corner
         self.aspectRatioChanged()
 
-    def aspectRatioChanged(self):
+    def aspectRatioChanged(self, winX=None, winY=None):
         """
         Called to notify the node that the aspect ratio has been changed. This
         is generally used like so::
             base.accept('aspectRatioChanged', pixelNode.aspectRatioChanged)
+        
+        Alternatively, you can not use base.accept and instead handle aspect ratio
+        changes manually (i.e. if you know when it will change). You can pass a
+        ``winX`` and ``winY`` to resize the overlays to fit a different resolution. 
         """
-        self.setScale(2.0/base.win.getXSize(), 1, -2.0/base.win.getYSize())
+        if winX is None:
+            winX = base.win.getXSize()
+        if winY is None:
+            winY = base.win.getYSize()
+        self.setScale(2.0/winX, 1, -2.0/winY)
             
 class Overlay(OverlayContainer):
     """
@@ -695,6 +703,13 @@ class TextOverlay(OverlayContainer):
         """ Returns the wordwrap, in pixels. """
         return self.wordwrap
     
+    def setAlign(self, align):
+        self.textNode.setAlign(align)
+        self.textChanged()
+    
+    def getAlign(self):
+        return self.textNode.getAlign()
+    
     def setTextSize(self, size):
         """ 
         Sets the scale of the text node and repositions it vertically to 
@@ -780,6 +795,8 @@ class TextOverlay(OverlayContainer):
         setScale() if you wish to scale the overlay, setTextScale() to set
         point size, or use word-wrapping to set the text box width in pixels 
         (and the height will be computed accordingly). """
+        if self.getText() == '':
+            return 0, 0
         xs, ys = self.xScale, self.yScale
         ppu = self.getTextSize()
         h = self.textNode.getHeight() * ys
