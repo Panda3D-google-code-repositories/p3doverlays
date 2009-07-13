@@ -453,7 +453,7 @@ if __name__ == '__main__':
         print '    overlaytool [-noclip] myTexture.png'
         print
         print 'Reverting to res/simple_ui.png'
-        sys.argv.append('res/powerbar.png')
+        sys.argv.append('res/simple_ui.png')
         
     tex = loader.loadTexture(sys.argv[1])
     o = OverlayTool(tex, clipboard)
