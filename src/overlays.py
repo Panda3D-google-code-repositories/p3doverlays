@@ -330,16 +330,6 @@ class Overlay(OverlayContainer):
         w, h = self.getSize()
         self.border.setSize(w+self.borderPadding*2, h+self.borderPadding*2)
     
-    def setTexture(self, texture):
-        """
-        Sets the texture of this overlay.
-        """
-        self.texture = texture
-        self.node.setTexture(texture)
-    
-    def getTexture(self):
-        return self.texture
-    
     def setTexcoords(self, x1, y1, x2, y2):
         """ Adjusts the texcoords (in pixels) for this geometry by 
         modifying the vertex data. """
